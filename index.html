@@ -1,0 +1,3145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Click24 CRM Inmobiliario - Gestión de clientes, pipeline y análisis para inmobiliarias">
+  <title>Click24 CRM | Inmobiliario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f4f5f8;
+      --surface:     #ffffff;
+      --surface2:    #f9fafb;
+      --surface3:    #f3f4f6;
+      --border:      #e5e7eb;
+      --border2:     #d1d5db;
+      --primary:     #111111;
+      --primary-l:   #1f2937;
+      --primary-g:   rgba(180,145,92,.08);
+      --secondary:   #b4915c;
+      --success:     #10b981;
+      --warning:     #f59e0b;
+      --danger:      #ef4444;
+      --orange:      #f97316;
+      --text:        #111827;
+      --text-m:      #4b5563;
+      --text-d:      #9ca3af;
+      --sidebar-w:   260px;
+      --r:           12px;
+      --r-sm:        8px;
+      --shadow:      0 4px 20px rgba(0,0,0,.06);
+      --t:           .18s ease;
+    }
+
+    body.dark {
+      --bg:          #08080c;
+      --surface:     #0f0f16;
+      --surface2:    #161622;
+      --surface3:    #1d1d2e;
+      --border:      #212132;
+      --border2:     #31314a;
+      --primary-g:   rgba(180,145,92,.12);
+      --text:        #f3f4f6;
+      --text-m:      #9ca3af;
+      --text-d:      #6b7280;
+      --shadow:      0 4px 24px rgba(0,0,0,.5);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--surface2); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .sidebar-logo {
+      padding: 22px 18px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,.4);
+      flex-shrink: 0;
+      letter-spacing: -1px;
+    }
+
+    .logo-text .l-name { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+    .logo-text .l-sub  { font-size: 10px; color: var(--text-m); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+
+    .sidebar-nav { padding: 14px 10px; flex: 1; overflow-y: auto; }
+
+    .nav-lbl {
+      font-size: 9.5px; font-weight: 700; color: var(--text-d);
+      letter-spacing: 1.8px; text-transform: uppercase;
+      padding: 0 8px; margin: 14px 0 5px;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--r-sm);
+      cursor: pointer; transition: all var(--t);
+      color: var(--text-m); font-size: 13.5px; font-weight: 500;
+      margin-bottom: 1px; border: 1px solid transparent;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active {
+      background: var(--primary-g);
+      color: var(--primary-l);
+      border-color: rgba(124,58,237,.25);
+    }
+    .nav-icon { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--primary);
+      color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 20px;
+    }
+
+    .sidebar-footer { padding: 14px; border-top: 1px solid var(--border); }
+
+    .db-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 10px 12px;
+      font-size: 11.5px; color: var(--text-m);
+    }
+    .db-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--warning); flex-shrink: 0;
+      animation: blink 2s infinite;
+    }
+    .db-dot.on { background: var(--success); animation: none; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ══════════════════════════════════════
+       MAIN AREA
+    ══════════════════════════════════════ */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 22px; height: 62px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      gap: 14px; flex-shrink: 0;
+    }
+
+    .topbar-title { font-size: 19px; font-weight: 800; color: var(--text); white-space: nowrap; }
+
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 8px 14px;
+      flex: 1; max-width: 360px; transition: border-color var(--t);
+    }
+    .search-box:focus-within { border-color: var(--primary); }
+    .search-box input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-size: 13px; font-family: inherit; width: 100%;
+    }
+    .search-box input::placeholder { color: var(--text-d); }
+    .search-icon { color: var(--text-d); font-size: 14px; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: var(--r-sm); border: none;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      font-family: inherit; transition: all var(--t); white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #5b21b6);
+      color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,.35);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(124,58,237,.5); }
+    .btn-ghost {
+      background: var(--surface2); color: var(--text-m);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--surface3); color: var(--text); }
+    .btn-danger { background: rgba(239,68,68,.12); color: var(--danger); border: 1px solid rgba(239,68,68,.25); }
+    .btn-danger:hover { background: rgba(239,68,68,.22); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-icon { width: 34px; height: 34px; padding: 0; justify-content: center; }
+
+    /* ── VIEWS ── */
+    .view { flex: 1; overflow-y: auto; padding: 22px; display: none; }
+    .view.active { display: block; }
+
+    /* ══════════════════════════════════════
+       DASHBOARD
+    ══════════════════════════════════════ */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 18px 20px;
+      position: relative; overflow: hidden;
+      transition: transform var(--t), border-color var(--t);
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--accent, var(--primary));
+      border-radius: var(--r) var(--r) 0 0;
+    }
+    .stat-lbl { font-size: 11px; font-weight: 600; color: var(--text-m); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+    .stat-val { font-size: 34px; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 6px; }
+    .stat-sub { font-size: 11.5px; color: var(--text-d); }
+    .stat-emoji { position: absolute; right: 14px; top: 14px; font-size: 28px; opacity: .12; }
+
+    .charts-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 20px;
+    }
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 18px 20px;
+    }
+    .chart-card.wide { grid-column: 1 / -1; }
+    .chart-hd { margin-bottom: 14px; }
+    .chart-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .chart-sub { font-size: 11.5px; color: var(--text-m); margin-top: 2px; }
+    .chart-box { position: relative; height: 200px; }
+    .chart-box.sh { height: 180px; }
+
+    .recent-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .section-hd { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+
+    /* ══════════════════════════════════════
+       ALERTS — Para llamar hoy
+    ══════════════════════════════════════ */
+    .alerts-section { margin-bottom: 20px; }
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+    }
+
+    .alert-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: all var(--t);
+      position: relative; overflow: hidden;
+    }
+    .alert-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .alert-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--alert-color, var(--warning));
+      border-radius: var(--r) 0 0 var(--r);
+    }
+    .alert-card.overdue { --alert-color: var(--danger); border-color: rgba(220,38,38,.2); background: rgba(220,38,38,.03); }
+    .alert-card.today   { --alert-color: var(--warning); border-color: rgba(217,119,6,.2);  background: rgba(217,119,6,.03); }
+
+    .alert-icon { font-size: 24px; flex-shrink: 0; }
+    .alert-body { flex: 1; min-width: 0; }
+    .alert-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .alert-meta { font-size: 11px; color: var(--text-m); margin-top: 2px; }
+    .alert-badge {
+      font-size: 10px; font-weight: 700; padding: 3px 9px;
+      border-radius: 20px; flex-shrink: 0;
+    }
+    .alert-badge.overdue { background: rgba(220,38,38,.12); color: var(--danger); }
+    .alert-badge.today   { background: rgba(217,119,6,.12);  color: var(--warning); }
+
+    /* ══════════════════════════════════════
+       PIPELINE KANBAN
+    ══════════════════════════════════════ */
+    .kanban-board {
+      display: flex; gap: 12px;
+      overflow-x: auto; padding-bottom: 16px;
+      align-items: flex-start;
+      min-height: calc(100vh - 148px);
+    }
+
+    .k-col {
+      min-width: 230px; max-width: 230px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); display: flex; flex-direction: column;
+      max-height: calc(100vh - 168px);
+    }
+
+    .k-col-hd {
+      padding: 13px 12px 10px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+    }
+    .k-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .k-name { font-size: 12.5px; font-weight: 700; color: var(--text); flex: 1; }
+    .k-cnt {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-m); font-size: 10.5px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    .k-cards {
+      padding: 8px; flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 7px;
+      min-height: 70px; border-radius: 0 0 var(--r) var(--r);
+      transition: background var(--t);
+    }
+    .k-cards.dov { background: rgba(124,58,237,.08); }
+
+    .k-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 11px;
+      cursor: pointer; transition: all var(--t);
+      position: relative;
+    }
+    .k-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    .k-card[draggable] { cursor: grab; }
+    .k-card.dragging { opacity: .3; }
+
+    .k-card-name {
+      font-size: 12.5px; font-weight: 700; color: var(--text);
+      margin-bottom: 5px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; padding-right: 20px;
+    }
+    .k-card-row {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 10.5px; color: var(--text-m); margin-bottom: 2px;
+    }
+    .k-card-budget { font-size: 11.5px; font-weight: 700; color: var(--success); margin-top: 7px; }
+    .k-card-ft {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--border);
+    }
+    .k-card-origin {
+      font-size: 9.5px; font-weight: 600; color: var(--text-d);
+      background: var(--surface3); padding: 2px 7px; border-radius: 10px;
+    }
+    .k-card-date { font-size: 9.5px; color: var(--text-d); }
+    .k-empty { text-align: center; color: var(--text-d); font-size: 11px; padding: 18px 0; }
+    .k-card-alert { position: absolute; top: 8px; right: 8px; font-size: 12px; }
+
+    /* ══════════════════════════════════════
+       TABLE
+    ══════════════════════════════════════ */
+    .table-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-sel {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--text);
+      font-size: 12.5px; font-family: inherit;
+      padding: 8px 12px; outline: none; cursor: pointer;
+      transition: border-color var(--t);
+    }
+    .filter-sel:focus { border-color: var(--primary); }
+
+    .tbl-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    thead { background: var(--surface2); border-bottom: 1px solid var(--border); }
+    th {
+      padding: 11px 13px; text-align: left;
+      font-size: 10.5px; font-weight: 700; color: var(--text-m);
+      text-transform: uppercase; letter-spacing: .6px; white-space: nowrap;
+    }
+    td { padding: 12px 13px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .td-name { font-weight: 700; }
+    .td-phone a { color: var(--secondary); text-decoration: none; }
+    .td-phone a:hover { text-decoration: underline; }
+    .td-acts { display: flex; gap: 5px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10.5px; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    .empty-st { text-align: center; padding: 50px 20px; color: var(--text-m); }
+    .empty-st .esi { font-size: 44px; margin-bottom: 14px; opacity: .35; }
+    .empty-st h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .empty-st p { font-size: 13px; }
+
+    /* page header */
+    .page-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .page-title { font-size: 21px; font-weight: 800; color: var(--text); }
+    .page-sub { font-size: 12.5px; color: var(--text-m); margin-top: 2px; }
+
+    /* ══════════════════════════════════════
+       MODAL
+    ══════════════════════════════════════ */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      z-index: 900;
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+      visibility: hidden;
+      pointer-events: none;
+      transition: background 0.28s ease, backdrop-filter 0.28s ease, visibility 0.28s;
+      overflow: hidden;
+    }
+    .overlay.open {
+      visibility: visible;
+      pointer-events: auto;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      width: 100%; max-width: 600px;
+      display: flex; flex-direction: column;
+      box-shadow: -10px 0 40px rgba(0,0,0,.15);
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .overlay.open .modal {
+      transform: translateX(0);
+    }
+
+    @media (max-width: 600px) {
+      .modal { max-width: 100%; }
+    }
+
+    .modal-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-title { font-size: 17px; font-weight: 800; color: var(--text); }
+    .modal-close {
+      width: 30px; height: 30px; border-radius: var(--r-sm);
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text-m); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; transition: all var(--t);
+    }
+    .modal-close:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    .modal-body { padding: 22px 24px; overflow-y: auto; flex: 1; }
+    .modal-ft {
+      padding: 15px 24px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+      background: var(--surface2); border-radius: 0; flex-shrink: 0;
+    }
+
+    /* ── WA TEMPLATE FLOATING MENU ── */
+    .wa-menu {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      width: 250px;
+      padding: 6px 0;
+      animation: waIn .15s ease;
+    }
+    @keyframes waIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .wa-menu-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-d);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 6px 12px 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .wa-menu-item {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .wa-menu-item:hover {
+      background: var(--surface2);
+      color: var(--primary);
+    }
+
+    /* ── FORM ── */
+    .f-section { margin-bottom: 22px; }
+    .f-section-title {
+      font-size: 10.5px; font-weight: 700; color: var(--primary-l);
+      text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 13px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .f-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .f-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .f-full { grid-column: 1 / -1; }
+
+    .f-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 11.5px; font-weight: 600; color: var(--text-m); }
+
+    input[type="text"], input[type="tel"], input[type="number"], input[type="date"],
+    select, textarea {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--text);
+      font-size: 13px; font-family: inherit;
+      padding: 9px 12px; outline: none; width: 100%;
+      transition: border-color var(--t), box-shadow var(--t);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-g);
+    }
+    textarea { resize: vertical; min-height: 75px; }
+    select option { background: var(--surface2); }
+
+    .budget-row { display: grid; grid-template-columns: 1fr 1fr 90px; gap: 8px; align-items: end; }
+
+    /* radio pills */
+    .pill-group { display: flex; gap: 7px; flex-wrap: wrap; }
+    .pill {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 7px 13px;
+      cursor: pointer; font-size: 12.5px; color: var(--text-m);
+      transition: all var(--t); user-select: none; font-weight: 500;
+    }
+    .pill:hover { border-color: var(--border2); color: var(--text); }
+    .pill.on { background: var(--primary-g); border-color: rgba(124,58,237,.45); color: var(--primary-l); font-weight: 700; }
+    .pill.on-teal { background: rgba(6,182,212,.1); border-color: rgba(6,182,212,.35); color: var(--secondary); font-weight: 700; }
+
+    /* delete confirm */
+    .del-confirm {
+      display: none; background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.2); border-radius: var(--r-sm);
+      padding: 11px 15px; font-size: 12.5px; color: var(--danger); margin-bottom: 14px;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 22px; right: 22px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--r-sm); padding: 11px 18px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: var(--shadow); z-index: 2000;
+      animation: tIn .25s ease;
+    }
+    @keyframes tIn { from { opacity:0; transform: translateY(14px) } to { opacity:1; transform: translateY(0) } }
+    .toast.ok { border-color: var(--success); color: var(--success); }
+    .toast.err { border-color: var(--danger); color: var(--danger); }
+
+    /* ══════════════════════════════════════
+       PRÓXIMO CONTACTO — badge inline
+    ══════════════════════════════════════ */
+    .prox-wrap { display: flex; align-items: center; gap: 8px; }
+    .prox-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 9px;
+      border-radius: 20px; flex-shrink: 0; white-space: nowrap;
+    }
+    .prox-badge.overdue { background: rgba(220,38,38,.12); color: var(--danger); }
+    .prox-badge.today   { background: rgba(217,119,6,.12);  color: var(--warning); }
+    .prox-badge.future  { background: rgba(5,150,105,.12);  color: var(--success); }
+
+    /* ══════════════════════════════════════
+       SEGUIMIENTO TIMELINE
+    ══════════════════════════════════════ */
+    .sgt-add-form {
+      display: grid; grid-template-columns: auto 1fr auto;
+      gap: 8px; align-items: center;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 10px 12px;
+      margin-bottom: 16px;
+    }
+    .sgt-type-sel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--text);
+      font-size: 12px; font-family: inherit;
+      padding: 7px 10px; outline: none; cursor: pointer;
+      transition: border-color var(--t), box-shadow var(--t);
+    }
+    .sgt-type-sel:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-g); }
+    .sgt-txt-input {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--text);
+      font-size: 12px; font-family: inherit;
+      padding: 7px 10px; outline: none; width: 100%;
+      transition: border-color var(--t), box-shadow var(--t);
+    }
+    .sgt-txt-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-g); }
+
+    .sgt-timeline { display: flex; flex-direction: column; }
+
+    .sgt-entry {
+      display: flex; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sgt-entry:last-child { border-bottom: none; }
+
+    .sgt-line-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0; width: 30px;
+    }
+    .sgt-dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .sgt-vline { flex: 1; width: 1px; background: var(--border); margin-top: 5px; min-height: 10px; }
+
+    .sgt-content { flex: 1; min-width: 0; padding-top: 4px; }
+    .sgt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .sgt-type-lbl { font-size: 12px; font-weight: 700; }
+    .sgt-date { font-size: 10.5px; color: var(--text-d); margin-left: auto; }
+    .sgt-text { font-size: 12px; color: var(--text-m); line-height: 1.5; }
+
+    .sgt-del {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-d); font-size: 12px; padding: 2px 6px;
+      border-radius: 4px; transition: all var(--t);
+      opacity: 0; flex-shrink: 0;
+    }
+    .sgt-entry:hover .sgt-del { opacity: 1; }
+    .sgt-del:hover { color: var(--danger); background: rgba(220,38,38,.1); }
+
+    .sgt-empty {
+      text-align: center; padding: 22px; color: var(--text-d);
+      font-size: 12px; background: var(--surface2);
+      border-radius: var(--r-sm); border: 1px dashed var(--border2);
+    }
+
+    /* ─── LOGIN OVERLAY ─── */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      padding: 32px 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.08);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    body.dark .login-card {
+      box-shadow: 0 10px 40px rgba(0,0,0,.4);
+    }
+    .login-logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .login-logo img {
+      max-height: 80px;
+      object-fit: contain;
+    }
+    body.dark .login-logo img, body.dark .sidebar-logo img {
+      filter: invert(0.92) contrast(1.2);
+    }
+    .login-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      text-align: center;
+    }
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .login-field label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-m);
+    }
+    .login-info-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 12px;
+      font-size: 11px;
+      color: var(--text-m);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .login-info-title {
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── USER PROFILE BAR WIDGET ─── */
+    .user-profile-widget {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: var(--surface2);
+    }
+    .badge-role {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+    .badge-role.admin { background: rgba(180,145,92,.16); color: var(--secondary); }
+    .badge-role.user { background: rgba(75,85,99,.12); color: var(--text-m); }
+
+    /* ─── PROPERTIES CATALOGUE ─── */
+    .properties-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .prop-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: transform var(--t), border-color var(--t);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .prop-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: var(--shadow);
+    }
+    .prop-img-container {
+      height: 160px;
+      background: var(--surface3);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .prop-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease;
+    }
+    .prop-card:hover .prop-img {
+      transform: scale(1.05);
+    }
+    .prop-badge-op {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .prop-badge-op.venta { background: var(--primary); }
+    .prop-badge-op.alquiler { background: var(--secondary); }
+    .prop-badge-op.temporario { background: var(--orange); }
+    
+    .prop-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .prop-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prop-price {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--success);
+    }
+    .prop-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      color: var(--text-m);
+      margin-top: 4px;
+    }
+    .prop-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .prop-footer {
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      background: var(--surface2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .prop-barrio {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-d);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── MATCHMAKING SECTIONS ─── */
+    .match-section {
+      background: rgba(180,145,92,.06);
+      border: 1px dashed rgba(180,145,92,.35);
+      border-radius: var(--r-sm);
+      padding: 16px;
+      margin-top: 20px;
+    }
+    body.dark .match-section {
+      background: rgba(180,145,92,.03);
+    }
+    .match-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .match-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .match-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+    .match-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .match-item-title {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .match-item-meta {
+      font-size: 10.5px;
+      color: var(--text-m);
+      margin-top: 2px;
+    }
+    .match-item-price {
+      font-weight: 700;
+      color: var(--success);
+      white-space: nowrap;
+    }
+    .match-empty {
+      font-size: 11.5px;
+      color: var(--text-d);
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    /* ─── RESPONSIVE MOBILE ─── */
+    .menu-btn { display: none; }
+    
+    @media (max-width: 1024px) {
+      .menu-btn {
+        display: inline-flex;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1100;
+        width: 80% !important;
+        max-width: 280px !important;
+        min-width: 0 !important;
+        transform: translateX(-100%);
+        transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,.15);
+      }
+      body.dark .sidebar {
+        box-shadow: 10px 0 30px rgba(0,0,0,.5);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0);
+        backdrop-filter: blur(0px);
+        z-index: 1050;
+        visibility: hidden;
+        pointer-events: none;
+        transition: background .3s, backdrop-filter .3s, visibility .3s;
+      }
+      .sidebar-backdrop.active {
+        visibility: visible;
+        pointer-events: auto;
+        background: rgba(0,0,0,.45);
+        backdrop-filter: blur(2px);
+      }
+
+      .main {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        height: auto;
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .search-box {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 4px;
+      }
+      .topbar-title {
+        font-size: 17px;
+      }
+      
+      .view {
+        padding: 12px 14px;
+      }
+      
+      .page-hd {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .page-hd div {
+        width: 100%;
+      }
+      .page-hd div[style*="display:flex"], 
+      .page-hd div[style*="display: flex"] {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .table-toolbar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
+      .table-toolbar select {
+        width: 100%;
+        margin: 0 !important;
+      }
+      #fi-orden {
+        grid-column: 1 / -1;
+        border-color: var(--primary);
+      }
+      
+      .f-grid, .f-grid.c3 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .budget-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      .sgt-add-form {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .sgt-add-form button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .modal-close {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+      }
+
+      .modal-ft {
+        padding: 12px 14px;
+        gap: 6px;
+      }
+      .modal-ft button {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    /* Scroll horizontal en tablas */
+    .tbl-wrap, .recent-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="login-overlay" style="display: none;">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="logo.jpg" alt="Propiedades Friedrich">
+    </div>
+    <div class="login-title">Propiedades Friedrich CRM</div>
+    
+    <form onsubmit="login(event)" style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="login-field">
+        <label>Usuario o Correo Electrónico</label>
+        <input type="text" id="login-email" required placeholder="Ej: Prueba" style="background: var(--surface2); border: 1px solid var(--border);">
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" required placeholder="••••••••" style="background: var(--surface2); border: 1px solid var(--border);">
+      </div>
+      
+      <button type="submit" class="btn btn-primary" style="justify-content: center; padding: 12px; margin-top: 6px;">Ingresar</button>
+    </form>
+    
+    <div class="login-info-box">
+      <div class="login-info-title">🔑 Credenciales de Acceso</div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px">👑</span>
+        <div>
+          <div style="font-weight:700;">Administrador</div>
+          <div style="color:var(--text-m);font-size:13px;">Usuario: <strong>Prueba</strong> &nbsp;|&nbsp; Contraseña: <strong>1234</strong></div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-d);">💡 El admin puede crear nuevos empleados desde la sección Empleados</div>
+    </div>
+  </div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo" style="padding: 18px 14px 12px; border-bottom: 1px solid var(--border);">
+    <div class="logo-wrap" style="flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+      <img src="logo.jpg" alt="Propiedades Friedrich" style="width: 100%; max-height: 80px; object-fit: contain;">
+    </div>
+  </div>
+
+  <!-- PERFIL USUARIO ACTIVO -->
+  <div class="user-profile-widget">
+    <div id="user-name-lbl" style="font-size: 13px; font-weight: 700; color: var(--text);">...</div>
+    <div id="user-role-lbl" class="badge-role user">...</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-lbl">Principal</div>
+    <div class="nav-item active" id="nav-dashboard" onclick="setView('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" id="nav-pipeline" onclick="setView('pipeline')">
+      <span class="nav-icon">🏗️</span> Pipeline
+      <span class="nav-badge" id="bdg-pipeline">0</span>
+    </div>
+    <div class="nav-item" id="nav-clientes" onclick="setView('clientes')">
+      <span class="nav-icon">👥</span> Clientes
+      <span class="nav-badge" id="bdg-clientes">0</span>
+    </div>
+    <div class="nav-item" id="nav-empleados" onclick="setView('empleados')" style="display: none;">
+      <span class="nav-icon">💼</span> Empleados
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--danger); color: var(--danger); background: rgba(220,38,38,.03);">
+      🚪 Cerrar Sesión
+    </button>
+    <button class="btn btn-ghost btn-sm" id="theme-toggle" onclick="toggleTheme()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--border2);">
+      <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
+    </button>
+    <div class="db-badge">
+      <div class="db-dot on" id="db-dot"></div>
+      <span id="db-txt">Supabase Activo</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn btn-ghost btn-icon menu-btn" id="menu-btn" onclick="toggleSidebar(true)">
+        ☰
+      </button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="g-search" placeholder="Buscar nombre, teléfono, barrio..." oninput="onSearch(this.value)">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="openModal()">＋ Nuevo</button>
+    </div>
+  </header>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="view active" id="view-dashboard">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-hd">
+          <div class="chart-title">🏗️ Pipeline por Etapa</div>
+          <div class="chart-sub">Distribución actual de leads</div>
+        </div>
+        <div class="chart-box"><canvas id="ch-stages"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-hd">
+          <div class="chart-title">📡 Leads por Origen</div>
+          <div class="chart-sub">¿De dónde vienen tus clientes?</div>
+        </div>
+        <div class="chart-box"><canvas id="ch-origins"></canvas></div>
+      </div>
+      <div class="chart-card wide">
+        <div class="chart-hd">
+          <div class="chart-title">📈 Captación Mensual</div>
+          <div class="chart-sub">Nuevos leads — últimos 6 meses</div>
+        </div>
+        <div class="chart-box sh"><canvas id="ch-monthly"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ALERTAS: Para llamar hoy -->
+    <div id="alerts-section" class="alerts-section" style="display:none">
+      <div class="section-hd" id="alerts-hd">📅 Para Llamar Hoy</div>
+      <div class="alerts-grid" id="alerts-grid"></div>
+    </div>
+
+    <div class="section-hd">⚡ Últimos Clientes Agregados</div>
+    <div class="recent-wrap" id="recent-tbl"></div>
+  </div>
+
+  <!-- ── PIPELINE ── -->
+  <div class="view" id="view-pipeline">
+    <div class="page-hd">
+      <div>
+        <div class="page-title">Pipeline de Captación</div>
+        <div class="page-sub">Arrastrá las tarjetas para cambiar etapa</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal()">＋ Nuevo Cliente</button>
+    </div>
+    <div class="kanban-board" id="kanban"></div>
+  </div>
+
+  <!-- ── CLIENTES ── -->
+  <div class="view" id="view-clientes">
+    <div class="page-hd">
+      <div>
+        <div class="page-title">Clientes</div>
+        <div class="page-sub" id="cl-count"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="exportCSV()">📤 Exportar CSV</button>
+        <button class="btn btn-primary" onclick="openModal()">＋ Nuevo Cliente</button>
+      </div>
+    </div>
+    <div class="table-toolbar">
+      <select class="filter-sel" id="fi-etapa" onchange="renderTable()">
+        <option value="">Todas las etapas</option>
+      </select>
+      <select class="filter-sel" id="fi-origen" onchange="renderTable()">
+        <option value="">Todos los orígenes</option>
+      </select>
+      <select class="filter-sel" id="fi-credito" onchange="renderTable()">
+        <option value="">Crédito: todos</option>
+        <option value="Sí">Apto crédito</option>
+        <option value="No">Sin crédito</option>
+        <option value="En trámite">En trámite</option>
+      </select>
+      <select class="filter-sel" id="fi-moneda" onchange="renderTable()">
+        <option value="">USD / ARS</option>
+        <option value="USD">USD</option>
+        <option value="ARS">ARS</option>
+      </select>
+      <select class="filter-sel" id="fi-orden" onchange="renderTable()" style="margin-left: auto; border-color: var(--primary);">
+        <option value="creadoEn_desc">📅 Más nuevos primero</option>
+        <option value="creadoEn_asc">📅 Más viejos primero</option>
+        <option value="budget_desc">💵 Presupuesto: Mayor a menor</option>
+        <option value="budget_asc">💵 Presupuesto: Menor a mayor</option>
+        <option value="prox_asc">🔔 Próximo contacto: Más urgente</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Localidad / Barrio</th>
+            <th>Presupuesto</th>
+            <th>Amb / Baños</th>
+            <th>Cochera</th>
+            <th>Crédito</th>
+            <th>Financiación</th>
+            <th>Etapa</th>
+            <th>Origen</th>
+            <th>Próx. Contacto</th>
+            <th>Ingreso</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  <!-- ── EMPLEADOS ── -->
+  <div class="view" id="view-empleados">
+    <div class="page-hd">
+      <div>
+        <div class="page-title">Empleados / Asesores</div>
+        <div class="page-sub" id="emp-count">0 empleados registrados</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="openEmpModal()">＋ Nuevo Empleado</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Usuario / Email</th>
+            <th>Contraseña</th>
+            <th>Rol</th>
+            <th>Clientes a cargo</th>
+          </tr>
+        </thead>
+        <tbody id="emp-tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- ══ MODAL ══ -->
+<div class="overlay" id="overlay" onclick="onOvClick(event)">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="modal-ttl">Nuevo Cliente</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="del-confirm" id="del-confirm">⚠️ ¿Seguro que querés eliminar este cliente? Esta acción no se puede deshacer.</div>
+
+      <!-- CONTACTO -->
+      <div class="f-section">
+        <div class="f-section-title">📞 Datos de Contacto</div>
+        <div class="f-grid">
+          <div class="f-group">
+            <label>Nombre Completo *</label>
+            <input type="text" id="f-nombre" placeholder="Ej: Juan García">
+          </div>
+          <div class="f-group">
+            <label>Teléfono de Contacto *</label>
+            <div style="display: flex; gap: 6px;">
+              <input type="tel" id="f-tel" placeholder="Ej: 11-5555-1234" style="flex: 1;">
+              <button class="btn btn-ghost btn-sm" id="btn-wa-templates" onclick="showWaTemplates(event)" style="padding: 0 10px; color: #25d366; border-color: rgba(37,211,102,.3); background: rgba(37,211,102,.05);" title="Plantillas de WhatsApp">
+                💬 Plantillas
+              </button>
+            </div>
+          </div>
+          <div class="f-group">
+            <label>Localidad</label>
+            <input type="text" id="f-localidad" placeholder="Ej: CABA, GBA Norte...">
+          </div>
+          <div class="f-group">
+            <label>Barrio de Interés</label>
+            <input type="text" id="f-barrio" placeholder="Ej: Palermo, Belgrano...">
+          </div>
+        </div>
+      </div>
+
+      <!-- QUÉ BUSCA -->
+      <div class="f-section">
+        <div class="f-section-title">🏠 Qué está buscando</div>
+        <div class="f-grid">
+          <div class="f-group f-full">
+            <label>Tipo de Operación</label>
+            <div class="pill-group" id="pg-operacion">
+              <div class="pill on" data-val="Compra" onclick="pickPill('pg-operacion','Compra',false,this)">🛒 Compra</div>
+              <div class="pill" data-val="Alquiler" onclick="pickPill('pg-operacion','Alquiler',false,this)">🔑 Alquiler</div>
+              <div class="pill" data-val="Alquiler Temporario" onclick="pickPill('pg-operacion','Alquiler Temporario',false,this)">⏱️ Temporario</div>
+            </div>
+          </div>
+          <div class="f-group f-full">
+            <label>Tipo de Propiedad (puede ser más de uno)</label>
+            <div class="pill-group" id="pg-tipo">
+              <div class="pill" data-val="Departamento" onclick="pickPill('pg-tipo','Departamento',true,this)">🏢 Depto</div>
+              <div class="pill" data-val="Casa" onclick="pickPill('pg-tipo','Casa',true,this)">🏠 Casa</div>
+              <div class="pill" data-val="PH" onclick="pickPill('pg-tipo','PH',true,this)">🏡 PH</div>
+              <div class="pill" data-val="Local" onclick="pickPill('pg-tipo','Local',true,this)">🏪 Local</div>
+              <div class="pill" data-val="Oficina" onclick="pickPill('pg-tipo','Oficina',true,this)">🏦 Oficina</div>
+              <div class="pill" data-val="Terreno" onclick="pickPill('pg-tipo','Terreno',true,this)">🌿 Terreno</div>
+              <div class="pill" data-val="Cochera" onclick="pickPill('pg-tipo','Cochera',true,this)">🚗 Cochera</div>
+            </div>
+          </div>
+          <div class="f-group">
+            <label>Ambientes</label>
+            <select id="f-ambientes">
+              <option value="">Indistinto</option>
+              <option value="1">1 ambiente</option>
+              <option value="2">2 ambientes</option>
+              <option value="3">3 ambientes</option>
+              <option value="4">4 ambientes</option>
+              <option value="5">5+ ambientes</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>Baños</label>
+            <select id="f-banos">
+              <option value="">Indistinto</option>
+              <option value="1">1 baño</option>
+              <option value="2">2 baños</option>
+              <option value="3">3 baños</option>
+              <option value="4">4+ baños</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>Cochera</label>
+            <select id="f-cochera">
+              <option value="Indistinto">Indistinto</option>
+              <option value="Cubierta">Cubierta</option>
+              <option value="Descubierta">Descubierta</option>
+              <option value="No tiene">No tiene</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESUPUESTO -->
+      <div class="f-section">
+        <div class="f-section-title">💰 Presupuesto y Financiación</div>
+        <div class="f-grid">
+          <div class="f-group f-full">
+            <label>Rango de Presupuesto</label>
+            <div class="budget-row">
+              <input type="number" id="f-pmin" placeholder="Mínimo" min="0">
+              <input type="number" id="f-pmax" placeholder="Máximo" min="0">
+              <select id="f-moneda">
+                <option value="USD">💵 USD</option>
+                <option value="ARS">🇦🇷 ARS</option>
+              </select>
+            </div>
+          </div>
+          <div class="f-group">
+            <label>Apto Crédito Hipotecario</label>
+            <div class="pill-group" id="pg-credito">
+              <div class="pill" data-val="Sí" onclick="pickPill('pg-credito','Sí',false,this)">✅ Sí</div>
+              <div class="pill on" data-val="No" onclick="pickPill('pg-credito','No',false,this)">❌ No</div>
+              <div class="pill" data-val="En trámite" onclick="pickPill('pg-credito','En trámite',false,this)">⏳ En trámite</div>
+            </div>
+          </div>
+          <div class="f-group">
+            <label>Forma de Financiación</label>
+            <div class="pill-group" id="pg-financiacion">
+              <div class="pill" data-val="Efectivo" onclick="pickPill('pg-financiacion','Efectivo',false,this)">💵 Efectivo</div>
+              <div class="pill" data-val="Anticipo" onclick="pickPill('pg-financiacion','Anticipo',false,this)">📥 Anticipo</div>
+              <div class="pill" data-val="Anticipo + Cuotas" onclick="pickPill('pg-financiacion','Anticipo + Cuotas',false,this)">📥➕ Anticipo + Cuotas</div>
+              <div class="pill" data-val="Cuotas" onclick="pickPill('pg-financiacion','Cuotas',false,this)">📋 Cuotas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GESTIÓN -->
+      <div class="f-section">
+        <div class="f-section-title">📋 Gestión del Lead</div>
+        <div class="f-grid">
+          <div class="f-group">
+            <label>Etapa del Pipeline</label>
+            <select id="f-etapa"></select>
+          </div>
+          <div class="f-group">
+            <label>Origen del Lead</label>
+            <select id="f-origen">
+              <option value="">Seleccionar origen...</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>Fecha Ingreso</label>
+            <input type="date" id="f-fecha">
+          </div>
+          <div class="f-group">
+            <label>📅 Próximo Contacto</label>
+            <div class="prox-wrap">
+              <input type="date" id="f-prox-contacto" oninput="updateProxBadge(this.value)">
+              <span class="prox-badge" id="prox-badge" style="display:none"></span>
+            </div>
+          </div>
+          <div class="f-group f-full" id="f-owner-group" style="display:none;">
+            <label>Asesor Asignado</label>
+            <select id="f-owner" style="width:100%;"></select>
+          </div>
+          <div class="f-group f-full">
+            <label>Observaciones / Notas</label>
+            <textarea id="f-notas" placeholder="Anotá detalles importantes, preferencias, próximos pasos..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEGUIMIENTO (solo al editar) -->
+      <div class="f-section" id="sgt-section" style="display:none">
+        <div class="f-section-title">🗂️ Historial de Seguimiento</div>
+        <div class="sgt-add-form">
+          <select class="sgt-type-sel" id="sgt-tipo">
+            <option value="📞 Llamada">📞 Llamada</option>
+            <option value="💬 WhatsApp">💬 WhatsApp</option>
+            <option value="🏠 Visita">🏠 Visita</option>
+            <option value="📧 Email">📧 Email</option>
+            <option value="📋 Propuesta">📋 Propuesta</option>
+            <option value="📝 Nota">📝 Nota</option>
+          </select>
+          <input class="sgt-txt-input" type="text" id="sgt-texto"
+            placeholder="Ej: Llamé, no contestó. Reintentar el lunes..."
+            onkeydown="if(event.key==='Enter'){addSeguimiento();event.preventDefault();}">
+          <button class="btn btn-primary btn-sm" onclick="addSeguimiento()">＋ Agregar</button>
+        </div>
+        <div class="sgt-timeline" id="sgt-timeline"></div>
+      </div>
+
+      <!-- CRUCE INTELIGENTE REMOVED -->
+
+    </div>
+
+    <div class="modal-ft">
+      <button class="btn btn-danger btn-sm" id="btn-del" onclick="triggerDelete()" style="display:none;margin-right:auto">🗑️ Eliminar</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveClient()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROPIEDAD MODAL / DRAWER REMOVED -->
+
+<!-- TOAST -->
+<div id="toast" style="display:none" class="toast"></div>
+
+<!-- LOGIN OVERLAY DELETED (DUPLICATE) -->
+
+<!-- WA MENU -->
+<div id="wa-menu" class="wa-menu" style="display: none;">
+  <div class="wa-menu-title">Seleccionar Plantilla</div>
+  <div class="wa-menu-item" onclick="sendWaTemplate(1)">👋 Presentación / Contacto</div>
+  <div class="wa-menu-item" onclick="sendWaTemplate(2)">🏠 Propuestas Encontradas</div>
+  <div class="wa-menu-item" onclick="sendWaTemplate(3)">📅 Coordinar Visita</div>
+  <div class="wa-menu-item" onclick="sendWaTemplate(4)">💬 Mensaje Directo</div>
+</div>
+
+<!-- ══ EMPLEADO MODAL / DRAWER ══ -->
+<div class="overlay" id="overlay-emp" onclick="onEmpOvClick(event)">
+  <div class="modal" style="max-width: 450px;">
+    <div class="modal-hd">
+      <div class="modal-title" id="modal-emp-ttl">Nuevo Empleado</div>
+      <button class="modal-close" onclick="closeEmpModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="f-section">
+        <div class="f-section-title">👤 Datos del Asesor</div>
+        <div class="f-grid">
+          <div class="f-group f-full">
+            <label>Nombre Completo *</label>
+            <input type="text" id="fe-nombre" placeholder="Ej: Carlos Asesor" required>
+          </div>
+          <div class="f-group f-full">
+            <label>Usuario o Correo Electrónico *</label>
+            <input type="text" id="fe-email" placeholder="Ej: carlos@friedrich.com o CarlosAsesor" required>
+          </div>
+          <div class="f-group f-full">
+            <label>Contraseña *</label>
+            <input type="password" id="fe-pass" placeholder="Mínimo 4 caracteres" required>
+          </div>
+          <div class="f-group f-full">
+            <label>Rol de Acceso</label>
+            <select id="fe-role">
+              <option value="user">💼 Asesor Inmobiliario (Vendedor)</option>
+              <option value="admin">👑 Administrador (Admin)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeEmpModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEmployee()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ─── CONFIG ─── */
+const STAGES = ['Nuevo','Contactado','Visita Coordinada','Visita Realizada','Negociación','Cerrado','Perdido'];
+const STAGE_COLOR = {
+  'Nuevo':             '#7c3aed',
+  'Contactado':        '#3b82f6',
+  'Visita Coordinada': '#f59e0b',
+  'Visita Realizada':  '#8b5cf6',
+  'Negociación':       '#f97316',
+  'Cerrado':           '#10b981',
+  'Perdido':           '#ef4444'
+};
+const ORIGINS = ['Portal Web','Redes Sociales','WhatsApp','Referido','Cartel','Búsqueda Directa','Otro'];
+
+// Colores del timeline de seguimiento
+const SGT_COLORS = {
+  '📞 Llamada':   { bg: 'rgba(180,145,92,.14)',  color: '#b4915c' },
+  '💬 WhatsApp':  { bg: 'rgba(37,211,102,.14)',  color: '#16a34a' },
+  '🏠 Visita':    { bg: 'rgba(245,158,11,.14)',  color: '#d97706' },
+  '📧 Email':     { bg: 'rgba(59,130,246,.14)',  color: '#3b82f6' },
+  '📋 Propuesta': { bg: 'rgba(249,115,22,.14)',  color: '#ea580c' },
+  '📝 Nota':      { bg: 'rgba(139,92,246,.14)',  color: '#8b5cf6' }
+};
+
+const supabaseUrl = 'https://piuhuwkkgdfzyukhngli.supabase.co';
+const supabaseKey = 'sb_publishable_OriN8olSNsIPo6lysdUCnQ_j_SoMT0d';
+const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+/* ─── STATE ─── */
+let leads       = [];
+let properties  = [];
+let view        = 'dashboard';
+let editId      = null;
+let q           = '';
+let delPhase    = false;
+let dragId      = null;
+let currentUser = null;
+let appUsers    = [];
+
+/* ─── AUTHENTICATION (localStorage-first, Supabase optional) ─── */
+
+// Usuarios por defecto si no hay ninguno guardado
+const DEFAULT_USERS = [
+  { id: 'admin_prueba', nombre: 'Administrador', email: 'Prueba', pass: '1234', role: 'admin' }
+];
+
+function getLocalUsers() {
+  try {
+    const raw = localStorage.getItem('friedrich_users');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  // Primera vez: guardar usuarios por defecto
+  localStorage.setItem('friedrich_users', JSON.stringify(DEFAULT_USERS));
+  return DEFAULT_USERS;
+}
+
+function saveLocalUsers(users) {
+  localStorage.setItem('friedrich_users', JSON.stringify(users));
+}
+
+function checkLogin() {
+  const session = sessionStorage.getItem('friedrich_session');
+  if (session) {
+    const users = getLocalUsers();
+    const user = users.find(u => u.email.toLowerCase() === session.toLowerCase());
+    if (user) {
+      currentUser = user;
+      appUsers = users;
+      document.getElementById('login-overlay').style.display = 'none';
+      updateUserSidebarUI();
+      loadData();
+      return;
+    }
+  }
+  document.getElementById('login-overlay').style.display = 'flex';
+}
+
+function login(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+
+  const users = getLocalUsers();
+  const user = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase() && u.pass === pass);
+
+  if (user) {
+    sessionStorage.setItem('friedrich_session', user.email);
+    currentUser = user;
+    appUsers = users;
+    document.getElementById('login-overlay').style.display = 'none';
+    updateUserSidebarUI();
+    toast(`👋 Bienvenido, ${currentUser.nombre}!`, 'ok');
+    loadData();
+  } else {
+    toast('⚠️ Usuario o contraseña incorrectos', 'err');
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('friedrich_session');
+  currentUser = null;
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function updateUserSidebarUI() {
+  const uName = document.getElementById('user-name-lbl');
+  const uRole = document.getElementById('user-role-lbl');
+  if (uName && uRole) {
+    uName.textContent = currentUser.nombre;
+    uRole.textContent = currentUser.role === 'admin' ? '👑 Administrador' : '💼 Asesor Inmobiliario';
+    uRole.className = currentUser.role === 'admin' ? 'badge-role admin' : 'badge-role user';
+  }
+  const navEmpleados = document.getElementById('nav-empleados');
+  if (navEmpleados) {
+    navEmpleados.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+  }
+}
+
+function getMyLeads() {
+  if (!currentUser) return [];
+  if (currentUser.role === 'admin') return leads;
+  return leads.filter(l => l.owner === currentUser.id);
+}
+
+/* ─── SEED DATA ─── */
+function seed() {
+  const ago = d => { const x = new Date(); x.setDate(x.getDate()-d); return x.toISOString().split('T')[0]; };
+  const fut = d => { const x = new Date(); x.setDate(x.getDate()+d); return x.toISOString().split('T')[0]; };
+  return [
+    {
+      id: uid(), nombre:'Carlos Gómez', telefono:'11-5487-9821', owner: 'vendedor1',
+      localidad:'CABA', barrio:'Palermo', operacion:'Compra',
+      tipoPropiedad:['Departamento'], ambientes:'3', cochera:'Sí',
+      presupuestoMin:300000, presupuestoMax:450000, moneda:'USD',
+      creditoHipotecario:'No', financiacion:'Efectivo',
+      etapa:'Visita Coordinada', origen:'Portal Web',
+      notas:'Busca depto luminoso con balcón.', creadoEn:ago(10),
+      proximoContacto: fut(1),
+      seguimiento: [
+        { id:uid(), tipo:'📞 Llamada', texto:'Primer contacto. Muy interesado. Le expliqué el proceso.', fecha:ago(10), hora:'10:30' },
+        { id:uid(), tipo:'💬 WhatsApp', texto:'Le envié 3 propiedades en Palermo. Le gustó la del piso 8.', fecha:ago(7), hora:'14:15' },
+        { id:uid(), tipo:'🏠 Visita', texto:'Visita coordinada para el jueves. Confirmo el miércoles.', fecha:ago(5), hora:'09:00' },
+      ]
+    },
+    {
+      id: uid(), nombre:'María Laura Fernández', telefono:'11-3214-5566', owner: 'vendedor1',
+      localidad:'CABA', barrio:'Belgrano', operacion:'Compra',
+      tipoPropiedad:['Casa'], ambientes:'4', cochera:'Sí',
+      presupuestoMin:500000, presupuestoMax:700000, moneda:'USD',
+      creditoHipotecario:'En trámite', financiacion:'Anticipo + Cuotas',
+      etapa:'Negociación', origen:'Referido',
+      notas:'Quiere jardín, mínimo 4 amb.', creadoEn:ago(5),
+      proximoContacto: ago(0),
+      seguimiento: [
+        { id:uid(), tipo:'📞 Llamada', texto:'Llamó ella. Quiere avanzar. Esperando pre-aprobado del banco.', fecha:ago(5), hora:'09:00' },
+        { id:uid(), tipo:'📋 Propuesta', texto:'Presenté oferta formal por Monroe 1200. Propietario considerando.', fecha:ago(3), hora:'16:30' },
+      ]
+    },
+    {
+      id: uid(), nombre:'Julián Álvarez', telefono:'11-9876-5432', owner: 'vendedor2',
+      localidad:'GBA Norte', barrio:'Vicente López', operacion:'Compra',
+      tipoPropiedad:['PH','Departamento'], ambientes:'2', cochera:'No',
+      presupuestoMin:150000, presupuestoMax:250000, moneda:'USD',
+      creditoHipotecario:'Sí', financiacion:'Anticipo',
+      etapa:'Nuevo', origen:'Redes Sociales',
+      notas:'', creadoEn:ago(2),
+      proximoContacto: ago(1),
+      seguimiento: []
+    },
+    {
+      id: uid(), nombre:'Sofía Rossi', telefono:'11-6543-2109', owner: 'vendedor2',
+      localidad:'CABA', barrio:'Recoleta', operacion:'Alquiler',
+      tipoPropiedad:['Departamento'], ambientes:'2', cochera:'Indistinto',
+      presupuestoMin:400000, presupuestoMax:600000, moneda:'ARS',
+      creditoHipotecario:'No', financiacion:'Efectivo',
+      etapa:'Cerrado', origen:'Portal Web',
+      notas:'Cerró contrato. Muy conforme.', creadoEn:ago(30),
+      proximoContacto: '',
+      seguimiento: [
+        { id:uid(), tipo:'🏠 Visita', texto:'Visitó el depto de Riobamba 650. Le encantó.', fecha:ago(35), hora:'11:00' },
+        { id:uid(), tipo:'📋 Propuesta', texto:'Firmó contrato. Operación cerrada exitosamente. ✅', fecha:ago(30), hora:'15:00' },
+      ]
+    },
+    {
+      id: uid(), nombre:'Roberto Peralta', telefono:'11-2345-6789', owner: 'vendedor1',
+      localidad:'CABA', barrio:'Centro', operacion:'Compra',
+      tipoPropiedad:['Local','Oficina'], ambientes:'', cochera:'No',
+      presupuestoMin:100000, presupuestoMax:200000, moneda:'USD',
+      creditoHipotecario:'No', financiacion:'Cuotas',
+      etapa:'Contactado', origen:'Búsqueda Directa',
+      notas:'Inversor buscando local comercial.', creadoEn:ago(7),
+      proximoContacto: fut(3),
+      seguimiento: [
+        { id:uid(), tipo:'📞 Llamada', texto:'Inversor serio. Quiere locales en Microcentro y San Telmo.', fecha:ago(7), hora:'12:00' },
+      ]
+    },
+    {
+      id: uid(), nombre:'Lucía Castro', telefono:'11-8765-4321', owner: 'vendedor2',
+      localidad:'GBA Norte', barrio:'Olivos', operacion:'Compra',
+      tipoPropiedad:['Casa'], ambientes:'3', cochera:'Sí',
+      presupuestoMin:350000, presupuestoMax:450000, moneda:'USD',
+      creditoHipotecario:'No', financiacion:'Efectivo',
+      etapa:'Perdido', origen:'Cartel',
+      notas:'Se fue con otra inmobiliaria.', creadoEn:ago(45),
+      proximoContacto: '',
+      seguimiento: [
+        { id:uid(), tipo:'📞 Llamada', texto:'Informó que ya cerró con otra inmobiliaria. Caso perdido.', fecha:ago(45), hora:'17:00' },
+      ]
+    },
+  ];
+}
+function uid() { return 'L-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+function seedProps() {
+  return [
+    { id: 'P-1', titulo: 'Depto de 3 amb con balcón', operacion: 'Compra', tipo: 'Departamento', barrio: 'Palermo', precio: 320000, moneda: 'USD', ambientes: '3', banos: '2', cochera: 'Cubierta', notas: 'Piso alto, súper luminoso.' },
+    { id: 'P-2', titulo: 'Casa de 4 amb con jardín', operacion: 'Compra', tipo: 'Casa', barrio: 'Belgrano', precio: 620000, moneda: 'USD', ambientes: '4', banos: '3', cochera: 'Cubierta', notas: 'Excelente ubicación, pileta.' },
+    { id: 'P-3', titulo: 'PH 2 ambientes sin expensas', operacion: 'Compra', tipo: 'PH', barrio: 'Palermo', precio: 175000, moneda: 'USD', ambientes: '2', banos: '1', cochera: 'No tiene', notas: 'Reciclado a nuevo, patio.' },
+    { id: 'P-4', titulo: 'Depto 2 amb amueblado', operacion: 'Alquiler', tipo: 'Departamento', barrio: 'Palermo', precio: 450000, moneda: 'ARS', ambientes: '2', banos: '1', cochera: 'No tiene', notas: 'Alquiler temporario o tradicional.' }
+  ];
+}
+
+/* ─── STORAGE ─── */
+/* ─── DATA LOADING (localStorage-first) ─── */
+function loadData() {
+  if (!currentUser) return;
+  // Cargar leads desde localStorage
+  try {
+    const raw = localStorage.getItem('friedrich_leads');
+    leads = raw ? JSON.parse(raw) : [];
+  } catch(e) { leads = []; }
+
+  // Cargar propiedades desde localStorage
+  try {
+    const rawP = localStorage.getItem('friedrich_props');
+    properties = rawP ? JSON.parse(rawP) : [];
+  } catch(e) { properties = []; }
+
+  // Si no hay leads y es admin, sembrar datos de ejemplo
+  if (leads.length === 0 && currentUser.role === 'admin') {
+    leads = seed();
+    saveLeads();
+  }
+
+  // Si no hay propiedades, sembrar propiedades de ejemplo
+  if (properties.length === 0 && currentUser.role === 'admin') {
+    properties = seedProps();
+    saveProps();
+  }
+
+  // Cargar usuarios
+  appUsers = getLocalUsers();
+
+  refresh();
+}
+
+function saveLeads() {
+  localStorage.setItem('friedrich_leads', JSON.stringify(leads));
+}
+
+function saveProps() {
+  localStorage.setItem('friedrich_props', JSON.stringify(properties));
+}
+
+// Helper: obtener nombre del dueño por id
+function getOwnerName(ownerId) {
+  const u = appUsers.find(u => u.id === ownerId);
+  return u ? u.nombre : (ownerId || 'Sin asignar');
+}
+
+// Alias para compatibilidad con código existente
+async function loadFromSupabase() {
+  loadData();
+}
+
+/* ─── NAVIGATION ─── */
+function setView(v) {
+  view = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('nav-'+v).classList.add('active');
+  document.getElementById('topbar-title').textContent = {dashboard:'Dashboard',pipeline:'Pipeline',clientes:'Clientes',empleados:'Empleados'}[v];
+  
+  toggleSidebar(false);
+  refresh();
+}
+
+/* ─── SEARCH ─── */
+function onSearch(val) {
+  q = val.toLowerCase().trim();
+  if (view === 'clientes') renderTable();
+  if (view === 'dashboard') renderDash();
+  if (view === 'propiedades') renderProperties();
+}
+
+function matchQuery(value, query) {
+  if (!value) return false;
+  const qClean = query.toLowerCase().trim();
+  
+  if (Array.isArray(value)) {
+    return value.some(val => matchQuery(val, query));
+  }
+  
+  const t = String(value).toLowerCase();
+  if (t.includes(qClean)) return true;
+  
+  // Intercambio inteligente de "compra" y "venta"
+  if ((qClean === 'venta' || qClean === 'compra') && (t === 'compra' || t === 'venta')) return true;
+  
+  // Normalización simple plural/singular (ej: "lotes" busca "lote", "departamentos" busca "departamento")
+  if (qClean.endsWith('s') && qClean.length > 3) {
+    const singularQ = qClean.slice(0, -1);
+    if (t.includes(singularQ)) return true;
+  }
+  if (t.endsWith('s') && t.length > 3) {
+    const singularT = t.slice(0, -1);
+    if (singularT.includes(qClean)) return true;
+  }
+  
+  return false;
+}
+
+function filtered() {
+  const myLeads = getMyLeads();
+  if (!q) return myLeads;
+  return myLeads.filter(l =>
+    matchQuery(l.nombre, q) ||
+    matchQuery(l.telefono, q) ||
+    matchQuery(l.barrio, q) ||
+    matchQuery(l.localidad, q) ||
+    matchQuery(l.operacion, q) ||
+    matchQuery(l.tipoPropiedad, q)
+  );
+}
+
+/* ─── DASHBOARD ─── */
+function renderDash() {
+  const myLeads = getMyLeads();
+  const tot  = myLeads.length;
+  const now  = new Date();
+  const mes  = myLeads.filter(l => {
+    const d = new Date(l.creadoEn||0);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).length;
+  const proc = myLeads.filter(l => !['Cerrado','Perdido'].includes(l.etapa)).length;
+  const cer  = myLeads.filter(l => l.etapa==='Cerrado').length;
+  const conv = tot ? Math.round(cer/tot*100) : 0;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card" style="--accent:#111111">
+      <div class="stat-lbl">Clientes Activos</div>
+      <div class="stat-val">${tot}</div>
+      <div class="stat-sub">En tu cartera</div>
+      <div class="stat-emoji">👥</div>
+    </div>
+    <div class="stat-card" style="--accent:#b4915c">
+      <div class="stat-lbl">Nuevos del Mes</div>
+      <div class="stat-val">${mes}</div>
+      <div class="stat-sub">Leads captados</div>
+      <div class="stat-emoji">📅</div>
+    </div>
+    <div class="stat-card" style="--accent:#f59e0b">
+      <div class="stat-lbl">En Proceso</div>
+      <div class="stat-val">${proc}</div>
+      <div class="stat-sub">En embudo de venta</div>
+      <div class="stat-emoji">⚡</div>
+    </div>
+    <div class="stat-card" style="--accent:#10b981">
+      <div class="stat-lbl">Cerrados</div>
+      <div class="stat-val">${cer}</div>
+      <div class="stat-sub">${conv}% conversión</div>
+      <div class="stat-emoji">🏆</div>
+    </div>
+  `;
+
+  renderCharts();
+  renderAlerts();
+  renderRecent();
+  updateBadges();
+}
+
+/* ─── ALERTAS (Para llamar hoy / vencidos) ─── */
+function renderAlerts() {
+  const today = new Date().toISOString().split('T')[0];
+  const myLeads = getMyLeads();
+  const alerts = myLeads.filter(l =>
+    l.proximoContacto &&
+    !['Cerrado','Perdido'].includes(l.etapa) &&
+    l.proximoContacto <= today
+  );
+
+  const sec = document.getElementById('alerts-section');
+  if (!alerts.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+
+  const overdue = alerts.filter(l => l.proximoContacto < today);
+  const todayOnes = alerts.filter(l => l.proximoContacto === today);
+
+  let hd = '';
+  if (overdue.length && todayOnes.length)
+    hd = `📅 Para llamar hoy (${todayOnes.length}) + Vencidos (${overdue.length})`;
+  else if (overdue.length)
+    hd = `⚠️ Seguimientos vencidos (${overdue.length})`;
+  else
+    hd = `📅 Para llamar hoy (${todayOnes.length})`;
+
+  document.getElementById('alerts-hd').textContent = hd;
+
+  document.getElementById('alerts-grid').innerHTML = alerts.map(l => {
+    const isOverdue = l.proximoContacto < today;
+    const cls  = isOverdue ? 'overdue' : 'today';
+    const lbl  = isOverdue ? `Vencido ${fmtDate(l.proximoContacto)}` : 'Hoy';
+    const icon = isOverdue ? '🔴' : '🟡';
+    const last = l.seguimiento && l.seguimiento.length
+      ? ' · Último: ' + l.seguimiento[l.seguimiento.length-1].tipo
+      : '';
+    return `
+    <div class="alert-card ${cls}" onclick="openModal('${l.id}')">
+      <div class="alert-icon">${icon}</div>
+      <div class="alert-body">
+        <div class="alert-name">${l.nombre}</div>
+        <div class="alert-meta">${l.etapa} · ${l.origen||'—'}${last}</div>
+      </div>
+      <span class="alert-badge ${cls}">${lbl}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ─── CHARTS ─── */
+function renderCharts() {
+  const destroy = id => { const c=Chart.getChart(id); if(c) c.destroy(); };
+
+  const isDark = document.body.classList.contains('dark');
+  const txtColor = isDark ? '#a5a5c5' : '#4a4a6a';
+  const mutedColor = isDark ? '#7c7c9c' : '#9090aa';
+  const gridColor = isDark ? '#26263c' : '#e2e4ed';
+
+  const myLeads = getMyLeads();
+
+  // Donut: Stages
+  destroy('ch-stages');
+  new Chart(document.getElementById('ch-stages'), {
+    type: 'doughnut',
+    data: {
+      labels: STAGES,
+      datasets: [{
+        data: STAGES.map(s => myLeads.filter(l=>l.etapa===s).length),
+        backgroundColor: STAGES.map(s => STAGE_COLOR[s]+'cc'),
+        borderColor: STAGES.map(s => STAGE_COLOR[s]),
+        borderWidth: 2, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { position:'right', labels:{ color:txtColor, font:{size:10,family:'Inter'}, boxWidth:10, padding:8 } }
+      }
+    }
+  });
+
+  // Bar: Origins
+  const oCounts = ORIGINS.map(o => myLeads.filter(l=>l.origen===o).length);
+  const oColors = ['#111111','#b4915c','#10b981','#f59e0b','#f97316','#06b6d4','#8b5cf6'];
+  destroy('ch-origins');
+  new Chart(document.getElementById('ch-origins'), {
+    type: 'bar',
+    data: { labels: ORIGINS, datasets: [{ data: oCounts, backgroundColor: oColors.map(c=>c+'99'), borderColor: oColors, borderWidth: 1.5, borderRadius: 6, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color:mutedColor, font:{size:9,family:'Inter'} }, grid: { display:false } },
+        y: { ticks: { color:mutedColor, font:{size:9} }, grid: { color:gridColor }, beginAtZero:true }
+      }
+    }
+  });
+
+  // Line: Monthly
+  const months=[], counts=[];
+  for (let i=5;i>=0;i--) {
+    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    const lbl=d.toLocaleString('es',{month:'short'});
+    months.push(lbl[0].toUpperCase()+lbl.slice(1));
+    counts.push(myLeads.filter(l=>{ if(!l.creadoEn) return false; const ld=new Date(l.creadoEn); return ld.getMonth()===d.getMonth()&&ld.getFullYear()===d.getFullYear(); }).length);
+  }
+  destroy('ch-monthly');
+  new Chart(document.getElementById('ch-monthly'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label:'Leads', data:counts,
+        borderColor:'#b4915c', backgroundColor:'rgba(180,145,92,.12)',
+        fill:true, tension:.42, pointBackgroundColor:'#b4915c',
+        pointRadius:4, pointHoverRadius:7, borderWidth:2
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ display:false } },
+      scales: {
+        x: { ticks:{color:mutedColor}, grid:{color:gridColor} },
+        y: { ticks:{color:mutedColor,stepSize:1}, grid:{color:gridColor}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderRecent() {
+  const myLeads = getMyLeads();
+  const recent = [...myLeads].sort((a,b)=>new Date(b.creadoEn||0)-new Date(a.creadoEn||0)).slice(0,6);
+  document.getElementById('recent-tbl').innerHTML = `
+    <table>
+      <thead><tr><th>Nombre</th><th>Teléfono</th><th>Barrio</th><th>Presupuesto</th><th>Etapa</th><th>Próx. Contacto</th></tr></thead>
+      <tbody>
+        ${recent.map(l=>`
+        <tr style="cursor:pointer" onclick="openModal('${l.id}')">
+          <td class="td-name">${l.nombre}</td>
+          <td class="td-phone"><a href="tel:${l.telefono}" onclick="event.stopPropagation()">${l.telefono}</a></td>
+          <td>${[l.localidad,l.barrio].filter(Boolean).join(' › ')||'—'}</td>
+          <td style="font-weight:700;color:#10b981">${fmtBudget(l)||'—'}</td>
+          <td>${stageBadge(l.etapa)}</td>
+          <td>${proxBadgeInline(l)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+/* ─── KANBAN ─── */
+function renderKanban() {
+  const myLeads = getMyLeads();
+  document.getElementById('kanban').innerHTML = STAGES.map(stage => {
+    const cards = myLeads.filter(l=>l.etapa===stage);
+    return `
+    <div class="k-col">
+      <div class="k-col-hd">
+        <div class="k-dot" style="background:${STAGE_COLOR[stage]}"></div>
+        <div class="k-name">${stage}</div>
+        <div class="k-cnt">${cards.length}</div>
+      </div>
+      <div class="k-cards" data-stage="${stage}"
+           ondragover="dOver(event)" ondragleave="dLeave(event)" ondrop="dDrop(event,'${stage}')">
+        ${cards.length ? cards.map(kCard).join('') : '<div class="k-empty">Sin clientes</div>'}
+      </div>
+    </div>`;
+  }).join('');
+  updateBadges();
+}
+
+function kCard(l) {
+  const today = new Date().toISOString().split('T')[0];
+  const alertIco = l.proximoContacto
+    ? (l.proximoContacto < today ? '🔴' : l.proximoContacto === today ? '🟡' : '')
+    : '';
+  return `
+  <div class="k-card" draggable="true" data-id="${l.id}"
+       ondragstart="dStart(event,'${l.id}')" ondragend="dEnd(event)"
+       onclick="openModal('${l.id}')">
+    ${alertIco ? `<span class="k-card-alert">${alertIco}</span>` : ''}
+    <div class="k-card-name">${l.nombre}</div>
+    <div class="k-card-row">📞 ${l.telefono}</div>
+    ${l.localidad||l.barrio ? `<div class="k-card-row">📍 ${[l.localidad,l.barrio].filter(Boolean).join(' › ')}</div>` : ''}
+    ${l.operacion ? `<div class="k-card-row">🏠 ${l.operacion}${l.tipoPropiedad?.length?' · '+l.tipoPropiedad[0]:''}</div>` : ''}
+    ${fmtBudget(l) ? `<div class="k-card-budget">${fmtBudget(l)}</div>` : ''}
+    <div class="k-card-ft">
+      <span class="k-card-origin">${l.origen||'—'}</span>
+      <span class="k-card-date">${fmtDate(l.creadoEn)}</span>
+    </div>
+  </div>`;
+}
+
+function dStart(e,id) { dragId=id; e.currentTarget.classList.add('dragging'); }
+function dEnd(e) { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.k-cards').forEach(c=>c.classList.remove('dov')); }
+function dOver(e) { e.preventDefault(); e.currentTarget.classList.add('dov'); }
+function dLeave(e) { e.currentTarget.classList.remove('dov'); }
+async function dDrop(e, stage) {
+  e.preventDefault(); e.currentTarget.classList.remove('dov');
+  if (!dragId) return;
+  const l = leads.find(x=>x.id===dragId);
+  if (l && l.etapa !== stage) {
+    const oldStage = l.etapa;
+    l.etapa = stage;
+    l.updatedAt = new Date().toISOString();
+    
+    if (!l.seguimiento) l.seguimiento = [];
+    const now = new Date();
+    l.seguimiento.push({
+      id: uid(),
+      tipo: '📝 Nota',
+      texto: `🔄 Etapa actualizada de "${oldStage}" a "${stage}" (Kanban)`,
+      fecha: now.toISOString().split('T')[0],
+      hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+    });
+
+    saveLeads();
+    renderKanban();
+    toast(`✅ ${l.nombre} → ${stage}`,'ok');
+  }
+  dragId = null;
+}
+
+/* ─── TABLE ─── */
+function renderTable() {
+  populateFilters();
+  const ef = document.getElementById('fi-etapa').value;
+  const of = document.getElementById('fi-origen').value;
+  const cf = document.getElementById('fi-credito').value;
+  const mf = document.getElementById('fi-moneda').value;
+
+  let rows = filtered().filter(l => {
+    if(ef && l.etapa!==ef) return false;
+    if(of && l.origen!==of) return false;
+    if(cf && l.creditoHipotecario!==cf) return false;
+    if(mf && l.moneda!==mf) return false;
+    return true;
+  });
+
+  const order = document.getElementById('fi-orden').value;
+  rows.sort((a, b) => {
+    if (order === 'creadoEn_desc') {
+      return new Date(b.creadoEn || 0) - new Date(a.creadoEn || 0);
+    }
+    if (order === 'creadoEn_asc') {
+      return new Date(a.creadoEn || 0) - new Date(b.creadoEn || 0);
+    }
+    if (order === 'budget_desc') {
+      return (b.presupuestoMax || b.presupuestoMin || 0) - (a.presupuestoMax || a.presupuestoMin || 0);
+    }
+    if (order === 'budget_asc') {
+      const valA = a.presupuestoMax || a.presupuestoMin || 0;
+      const valB = b.presupuestoMax || b.presupuestoMin || 0;
+      if (valA === 0) return 1;
+      if (valB === 0) return -1;
+      return valA - valB;
+    }
+    if (order === 'prox_asc') {
+      const valA = a.proximoContacto || '9999-99-99';
+      const valB = b.proximoContacto || '9999-99-99';
+      return valA.localeCompare(valB);
+    }
+    return 0;
+  });
+
+  document.getElementById('cl-count').textContent = `${rows.length} cliente${rows.length!==1?'s':''} encontrado${rows.length!==1?'s':''}`;
+
+  const tbody = document.getElementById('tbl-body');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-st"><div class="esi">🔍</div><h3>Sin resultados</h3><p>No hay clientes con esos filtros.</p></div></td></tr>`;
+    return;
+  }
+
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const headerHtml = `
+    <tr>
+      <th>Nombre</th>
+      <th>Teléfono</th>
+      <th>Localidad / Barrio</th>
+      <th>Presupuesto</th>
+      <th>Amb / Baños</th>
+      <th>Cochera</th>
+      <th>Crédito</th>
+      <th>Financiación</th>
+      <th>Etapa</th>
+      <th>Origen</th>
+      ${isAdmin ? '<th>Asesor</th>' : ''}
+      <th>Próx. Contacto</th>
+      <th>Ingreso</th>
+      <th></th>
+    </tr>
+  `;
+  document.querySelector('#view-clientes thead').innerHTML = headerHtml;
+
+  tbody.innerHTML = rows.map(l => {
+    const ownerObj = appUsers.find(u => u.id === l.owner);
+    const ownerName = ownerObj ? ownerObj.nombre : 'Sin asignar';
+    return `
+    <tr>
+      <td class="td-name">${l.nombre}</td>
+      <td class="td-phone">
+        <a href="tel:${l.telefono}" onclick="event.stopPropagation()">${l.telefono}</a>
+        <a href="https://wa.me/549${l.telefono.replace(/\D/g,'')}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp" style="margin-left:6px;color:#25d366;text-decoration:none">💬</a>
+      </td>
+      <td>${[l.localidad,l.barrio].filter(Boolean).join(' › ')||'—'}</td>
+      <td style="font-weight:700;color:#10b981;white-space:nowrap">${fmtBudget(l)||'—'}</td>
+      <td style="color:var(--text-m);white-space:nowrap">${l.ambientes?l.ambientes+' amb.':'—'}${l.banos?' / '+l.banos+' bñ':''}</td>
+      <td style="color:var(--text-m)">${l.cochera||'—'}</td>
+      <td>${creditBadge(l.creditoHipotecario)}</td>
+      <td style="color:var(--text-m);font-size:11.5px">${l.financiacion||'—'}</td>
+      <td>${stageBadge(l.etapa)}</td>
+      <td style="color:var(--text-m)">${l.origen||'—'}</td>
+      ${isAdmin ? `<td style="font-weight:600;color:var(--secondary)">${ownerName}</td>` : ''}
+      <td>${proxBadgeInline(l)}</td>
+      <td style="color:var(--text-d);white-space:nowrap">${fmtDate(l.creadoEn)}</td>
+      <td>
+        <div class="td-acts">
+          <button class="btn btn-ghost btn-icon btn-sm" onclick="openModal('${l.id}')" title="Editar">✏️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  updateBadges();
+}
+
+/* ─── EMPLEADOS ─── */
+function openEmpModal() {
+  document.getElementById('fe-nombre').value = '';
+  document.getElementById('fe-email').value = '';
+  document.getElementById('fe-pass').value = '';
+  document.getElementById('fe-role').value = 'user';
+  document.getElementById('overlay-emp').classList.add('open');
+}
+
+function closeEmpModal() {
+  document.getElementById('overlay-emp').classList.remove('open');
+}
+
+function onEmpOvClick(e) {
+  if (e.target === document.getElementById('overlay-emp')) closeEmpModal();
+}
+
+function saveEmployee() {
+  const nombre = document.getElementById('fe-nombre').value.trim();
+  const email  = document.getElementById('fe-email').value.trim();
+  const pass   = document.getElementById('fe-pass').value;
+  const role   = document.getElementById('fe-role').value;
+
+  if (!nombre) { toast('⚠️ El nombre es obligatorio', 'err'); return; }
+  if (!email)  { toast('⚠️ El usuario es obligatorio', 'err'); return; }
+  if (pass.length < 4) { toast('⚠️ La contraseña debe tener mínimo 4 caracteres', 'err'); return; }
+
+  const users = getLocalUsers();
+  // Verificar que no exista ya ese usuario
+  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+    toast('⚠️ Ya existe un empleado con ese usuario', 'err');
+    return;
+  }
+
+  const empId = 'user_' + Date.now().toString(36);
+  const newEmp = { id: empId, nombre, email, pass, role };
+  users.push(newEmp);
+  saveLocalUsers(users);
+  appUsers = users;
+
+  toast('✅ Empleado registrado con éxito', 'ok');
+  closeEmpModal();
+  refresh();
+}
+
+function renderEmployees() {
+  const tbody = document.getElementById('emp-tbl-body');
+  if (!tbody) return;
+  
+  document.getElementById('emp-count').textContent = `${appUsers.length} empleado${appUsers.length!==1?'s':''} registrado${appUsers.length!==1?'s':''}`;
+  
+  if (!appUsers.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-st"><div class="esi">👥</div><h3>No hay empleados</h3></div></td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = appUsers.map(u => {
+    const leadCount = leads.filter(l => l.owner === u.id).length;
+    const roleLabel = u.role === 'admin' ? '👑 Administrador' : '💼 Asesor';
+    const badgeClass = u.role === 'admin' ? 'badge-role admin' : 'badge-role user';
+    
+    return `
+      <tr>
+        <td style="font-weight:700;">${u.nombre}</td>
+        <td style="color:var(--text-m);">${u.email}</td>
+        <td style="color:var(--text-d); font-family:monospace;">${u.pass}</td>
+        <td><span class="${badgeClass}">${roleLabel}</span></td>
+        <td style="font-weight:700; color:var(--primary);">${leadCount} cliente${leadCount!==1?'s':''}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function populateFilters() {
+  const ef = document.getElementById('fi-etapa');
+  const of = document.getElementById('fi-origen');
+  if (ef.options.length <= 1) STAGES.forEach(s => { const o=document.createElement('option'); o.value=o.textContent=s; ef.appendChild(o); });
+  if (of.options.length <= 1) ORIGINS.forEach(s => { const o=document.createElement('option'); o.value=o.textContent=s; of.appendChild(o); });
+}
+
+/* ─── CSV EXPORT ─── */
+function exportCSV() {
+  const rows = filtered();
+  if (!rows.length) { toast('⚠️ No hay datos para exportar','err'); return; }
+
+  const headers = [
+    'Nombre','Teléfono','Localidad','Barrio','Operación','Tipo Propiedad',
+    'Ambientes','Baños','Cochera','Presupuesto Min','Presupuesto Max','Moneda',
+    'Crédito','Financiación','Etapa','Origen','Próximo Contacto','Fecha Ingreso',
+    'Notas','Asesor'
+  ];
+  const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+
+  const csv = [
+    headers.map(esc).join(','),
+    ...rows.map(l => {
+      const ownerName = getOwnerName(l.owner);
+      return [
+        l.nombre, l.telefono, l.localidad, l.barrio, l.operacion,
+        (l.tipoPropiedad||[]).join('; '),
+        l.ambientes, l.banos, l.cochera,
+        l.presupuestoMin, l.presupuestoMax, l.moneda,
+        l.creditoHipotecario, l.financiacion, l.etapa, l.origen,
+        l.proximoContacto||'', l.creadoEn, l.notes || l.notas, ownerName
+      ].map(esc).join(',');
+    })
+  ].join('\n');
+
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `propiedades_friedrich_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast(`✅ ${rows.length} clientes exportados`,'ok');
+}
+
+/* ─── PROPERTIES LOGIC ─── */
+function getPropImgUrl(tipo) {
+  const map = {
+    'Departamento': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&auto=format&fit=crop&q=60',
+    'Casa': 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&auto=format&fit=crop&q=60',
+    'PH': 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&auto=format&fit=crop&q=60',
+    'Local': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&auto=format&fit=crop&q=60',
+    'Oficina': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop&q=60',
+    'Terreno': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&auto=format&fit=crop&q=60',
+    'Cochera': 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=400&auto=format&fit=crop&q=60'
+  };
+  return map[tipo] || 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&auto=format&fit=crop&q=60';
+}
+
+function renderProperties() {
+  const op = document.getElementById('f-p-operacion').value;
+  const tp = document.getElementById('f-p-tipo').value;
+  const ord = document.getElementById('f-p-orden').value;
+
+  let list = properties.filter(p => {
+    if (op && p.operacion !== op) return false;
+    if (tp && p.tipo !== tp) return false;
+    if (q && 
+        !matchQuery(p.titulo, q) && 
+        !matchQuery(p.barrio, q) && 
+        !matchQuery(p.operacion, q) && 
+        !matchQuery(p.tipo, q)
+    ) return false;
+    return true;
+  });
+
+  list.sort((a,b) => {
+    if (ord === 'precio_desc') return b.precio - a.precio;
+    if (ord === 'precio_asc') return a.precio - b.precio;
+    if (ord === 'titulo_asc') return a.titulo.localeCompare(b.titulo);
+    return 0;
+  });
+
+  document.getElementById('prop-count').textContent = `${list.length} propiedad${list.length!==1?'es':''} cargada${list.length!==1?'s':''}`;
+
+  const grid = document.getElementById('properties-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-st f-full"><div class="esi">🏢</div><h3>No hay propiedades</h3><p>Probá cargando una nueva propiedad o cambiando los filtros.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    const isVenta = p.operacion === 'Compra';
+    const tagClass = isVenta ? 'venta' : (p.operacion === 'Alquiler' ? 'alquiler' : 'temporario');
+    const labelOp = isVenta ? 'Venta' : (p.operacion === 'Alquiler' ? 'Alquiler' : 'Temporario');
+    return `
+      <div class="prop-card" onclick="openPropModal('${p.id}')">
+        <div class="prop-img-container">
+          <span class="prop-badge-op ${tagClass}">${labelOp}</span>
+          <img class="prop-img" src="${getPropImgUrl(p.tipo)}" alt="${p.titulo}">
+        </div>
+        <div class="prop-info">
+          <div class="prop-title">${p.titulo}</div>
+          <div class="prop-price">${p.moneda} ${p.precio.toLocaleString()}</div>
+          <div class="prop-meta-row">
+            ${p.ambientes ? `<span class="prop-meta-item">🚪 ${p.ambientes} amb.</span>` : ''}
+            ${p.banos ? `<span class="prop-meta-item">🛁 ${p.banos} bñ</span>` : ''}
+          </div>
+        </div>
+        <div class="prop-footer">
+          <span class="prop-barrio">📍 ${p.barrio}</span>
+          <button class="btn btn-ghost btn-sm" style="padding: 4px 8px;" onclick="openPropModal('${p.id}'); event.stopPropagation();">✏️ Editar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  updateBadges();
+}
+
+function openPropModal(id = null) {
+  const waMenu = document.getElementById('wa-menu');
+  if (waMenu) waMenu.style.display = 'none';
+  editPropId = id;
+  delPropPhase = false;
+  document.getElementById('del-prop-confirm').style.display = 'none';
+  document.getElementById('btn-prop-del').style.display = id ? 'inline-flex' : 'none';
+  document.getElementById('btn-prop-del').textContent = '🗑️ Eliminar';
+  document.getElementById('modal-prop-ttl').textContent = id ? 'Editar Propiedad' : 'Nueva Propiedad';
+  document.getElementById('match-prop-section').style.display = id ? 'block' : 'none';
+
+  if (id) {
+    const p = properties.find(x=>x.id===id);
+    if (!p) return;
+    setF('fp-titulo',    p.titulo||'');
+    setF('fp-barrio',    p.barrio||'');
+    setF('fp-precio',    p.precio||'');
+    setF('fp-moneda',    p.moneda||'USD');
+    setF('fp-ambientes', p.ambientes||'');
+    setF('fp-banos',     p.banos||'');
+    setF('fp-cochera',   p.cochera||'No tiene');
+    setF('fp-notas',     p.notas||'');
+    setF('fp-tipo',      p.tipo||'Departamento');
+    syncPillGroup('pg-p-operacion', p.operacion||'Compra', false);
+    renderPropertyMatches(p);
+  } else {
+    ['fp-titulo','fp-barrio','fp-precio','fp-notes','fp-notas'].forEach(fid=>setF(fid,''));
+    setF('fp-moneda','USD'); setF('fp-ambientes',''); setF('fp-banos',''); setF('fp-cochera','No tiene');
+    setF('fp-tipo','Departamento');
+    syncPillGroup('pg-p-operacion','Compra',false);
+  }
+
+  document.getElementById('overlay-prop').classList.add('open');
+  document.getElementById('fp-titulo').focus();
+}
+
+function closePropModal() {
+  document.getElementById('overlay-prop').classList.remove('open');
+  editPropId = null; delPropPhase = false;
+}
+
+function onPropOvClick(e) { if(e.target===document.getElementById('overlay-prop')) closePropModal(); }
+
+function saveProperty() {
+  const titulo = getF('fp-titulo').trim();
+  const barrio = getF('fp-barrio').trim();
+  const precio = parseFloat(getF('fp-precio'))||0;
+
+  if (!titulo) { toast('⚠️ El título es obligatorio','err'); return; }
+  if (!barrio) { toast('⚠️ El barrio es obligatorio','err'); return; }
+  if (!precio) { toast('⚠️ El precio es obligatorio','err'); return; }
+
+  const data = {
+    titulo, barrio, precio,
+    moneda:      getF('fp-moneda'),
+    operacion:   getPillVal('pg-p-operacion'),
+    tipo:        getF('fp-tipo'),
+    ambientes:   getF('fp-ambientes'),
+    banos:       getF('fp-banos'),
+    cochera:     getF('fp-cochera'),
+    notas:       getF('fp-notas').trim()
+  };
+
+  if (editPropId) {
+    const i = properties.findIndex(p=>p.id===editPropId);
+    if (i!==-1) properties[i] = { ...properties[i], ...data };
+    toast('✅ Propiedad actualizada','ok');
+  } else {
+    properties.unshift({ id: 'P-'+Date.now(), ...data });
+    toast('✅ Propiedad agregada','ok');
+  }
+
+  saveProps(); closePropModal(); refresh();
+}
+
+function triggerPropDelete() {
+  if (!delPropPhase) {
+    delPropPhase = true;
+    document.getElementById('del-prop-confirm').style.display = 'block';
+    document.getElementById('btn-prop-del').textContent = '⚠️ Confirmar eliminación';
+    return;
+  }
+  properties = properties.filter(p=>p.id!==editPropId);
+  saveProps(); closePropModal(); refresh();
+  toast('🗑️ Propiedad eliminada','err');
+}
+
+/* ─── CLIENT MATCHMAKING ─── */
+function renderClientMatches(lead) {
+  const list = document.getElementById('match-props-list');
+  if (!list) return;
+  const matches = properties.filter(p => {
+    if (p.operacion !== lead.operacion) return false;
+    if (lead.tipoPropiedad && lead.tipoPropiedad.length && !lead.tipoPropiedad.includes(p.tipo)) return false;
+    if (lead.barrio && p.barrio && !p.barrio.toLowerCase().includes(lead.barrio.toLowerCase()) && !lead.barrio.toLowerCase().includes(p.barrio.toLowerCase())) return false;
+    if (lead.presupuestoMax && p.precio > lead.presupuestoMax) return false;
+    if (lead.presupuestoMin && p.precio < lead.presupuestoMin) return false;
+    return true;
+  });
+
+  if (!matches.length) {
+    list.innerHTML = `<div class="match-empty">🏠 Sin propiedades coincidentes en cartera.</div>`;
+    return;
+  }
+
+  list.innerHTML = matches.map(p => `
+    <div class="match-item">
+      <div class="match-item-info">
+        <div class="match-item-title">${p.titulo}</div>
+        <div class="match-item-meta">📍 ${p.barrio} · ${p.tipo} · ${p.operacion}</div>
+      </div>
+      <div class="match-item-price">${p.moneda} ${p.precio.toLocaleString()}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal(); setView('propiedades'); openPropModal('${p.id}'); event.stopPropagation();" title="Ver propiedad" style="padding: 6px 8px;">👁️</button>
+    </div>
+  `).join('');
+}
+
+/* ─── PROPERTY MATCHMAKING ─── */
+function renderPropertyMatches(prop) {
+  const list = document.getElementById('match-leads-list');
+  const myLeads = getMyLeads();
+  const matches = myLeads.filter(l => {
+    if (l.operacion !== prop.operacion) return false;
+    if (l.tipoPropiedad && l.tipoPropiedad.length && !l.tipoPropiedad.includes(prop.tipo)) return false;
+    if (l.barrio && prop.barrio && !prop.barrio.toLowerCase().includes(l.barrio.toLowerCase()) && !l.barrio.toLowerCase().includes(prop.barrio.toLowerCase())) return false;
+    if (l.presupuestoMax && prop.precio > l.presupuestoMax) return false;
+    if (l.presupuestoMin && prop.precio < l.presupuestoMin) return false;
+    return true;
+  });
+
+  if (!matches.length) {
+    list.innerHTML = `<div class="match-empty">👥 Sin clientes interesados en cartera.</div>`;
+    return;
+  }
+
+  list.innerHTML = matches.map(l => {
+    const ownerName = getOwnerName(l.owner);
+    const waMsg = `Hola ${l.nombre}, ¿cómo estás? Te escribo de Propiedades Friedrich. Quería comentarte que ingresó una propiedad en ${prop.barrio} (${prop.tipo} de ${prop.ambientes} amb.) por ${prop.moneda} ${prop.precio.toLocaleString()} que coincide exactamente con lo que estás buscando. ¿Te interesaría coordinar una visita?`;
+    const cleanPhone = l.telefono.replace(/\D/g, '');
+    let finalPhone = cleanPhone;
+    if (!finalPhone.startsWith('54') && finalPhone.length > 0) {
+      finalPhone = '549' + finalPhone;
+    }
+    const waUrl = `https://wa.me/${finalPhone}?text=${encodeURIComponent(waMsg)}`;
+
+    return `
+      <div class="match-item">
+        <div class="match-item-info">
+          <div class="match-item-title">${l.nombre}</div>
+          <div class="match-item-meta">📞 ${l.telefono} · Presupuesto: ${fmtBudget(l)} · Asesor: ${ownerName}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <a href="${waUrl}" target="_blank" class="btn btn-ghost btn-sm" style="color:#25d366;border-color:rgba(37,211,102,.3);padding:6px 8px" onclick="event.stopPropagation();" title="Enviar Propuesta">💬 Ofrecer</a>
+          <button class="btn btn-ghost btn-sm" onclick="closePropModal(); setView('clientes'); openModal('${l.id}'); event.stopPropagation();" title="Ver cliente" style="padding: 6px 8px;">👁️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ─── MODAL OVERRIDES ─── */
+function openModal(id = null) {
+  const waMenu = document.getElementById('wa-menu');
+  if (waMenu) waMenu.style.display = 'none';
+  editId = id;
+  delPhase = false;
+  document.getElementById('del-confirm').style.display = 'none';
+  document.getElementById('btn-del').style.display = id ? 'inline-flex' : 'none';
+  document.getElementById('btn-del').textContent = '🗑️ Eliminar';
+  document.getElementById('modal-ttl').textContent = id ? 'Editar Cliente' : 'Nuevo Cliente';
+  const mSec = document.getElementById('match-client-section');
+  if (mSec) mSec.style.display = id ? 'block' : 'none';
+
+  document.getElementById('sgt-section').style.display = id ? 'block' : 'none';
+
+  const sel_e = document.getElementById('f-etapa');
+  sel_e.innerHTML = STAGES.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const sel_o = document.getElementById('f-origen');
+  sel_o.innerHTML = '<option value="">Seleccionar origen...</option>' + ORIGINS.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+  // Rellenar dropdown de Asesor asignado
+  const sel_owner = document.getElementById('f-owner');
+  if (sel_owner) {
+    sel_owner.innerHTML = appUsers.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+  }
+  const ownerGrp = document.getElementById('f-owner-group');
+  if (ownerGrp) {
+    ownerGrp.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+  }
+
+  if (id) {
+    const l = leads.find(x=>x.id===id);
+    if (!l) return;
+    setF('f-nombre',      l.nombre||'');
+    setF('f-tel',         l.telefono||'');
+    setF('f-localidad',   l.localidad||'');
+    setF('f-barrio',      l.barrio||'');
+    setF('f-pmin',        l.presupuestoMin||'');
+    setF('f-pmax',        l.presupuestoMax||'');
+    setF('f-moneda',      l.moneda||'USD');
+    setF('f-ambientes',   l.ambientes||'');
+    setF('f-banos',       l.banos||'');
+    setF('f-cochera',     l.cochera||'Indistinto');
+    setF('f-notas',       l.notas||'');
+    setF('f-etapa',       l.etapa||'Nuevo');
+    setF('f-origen',      l.origen||'');
+    setF('f-fecha',       l.creadoEn||new Date().toISOString().split('T')[0]);
+    setF('f-prox-contacto', l.proximoContacto||'');
+    
+    // Asignar Asesor actual en el dropdown
+    setF('f-owner',       l.owner||currentUser.id);
+    
+    syncPillGroup('pg-operacion',   l.operacion||'Compra', false);
+    syncPillGroup('pg-credito',     l.creditoHipotecario||'No', false);
+    syncPillGroup('pg-financiacion',l.financiacion||'', false);
+    syncPillGroup('pg-tipo',        l.tipoPropiedad||[], true);
+    updateProxBadge(l.proximoContacto||'');
+    renderSeguimiento(l.seguimiento||[]);
+    renderClientMatches(l);
+  } else {
+    ['f-nombre','f-tel','f-localidad','f-barrio','f-pmin','f-pmax','f-notes','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
+    setF('f-moneda','USD'); setF('f-ambientes',''); setF('f-banos',''); setF('f-cochera','Indistinto');
+    setF('f-fecha', new Date().toISOString().split('T')[0]);
+    
+    // Por defecto el asesor responsable es el que crea el cliente
+    setF('f-owner',       currentUser.id);
+    
+    syncPillGroup('pg-operacion','Compra',false);
+    syncPillGroup('pg-credito','No',false);
+    syncPillGroup('pg-financiacion','',false);
+    syncPillGroup('pg-tipo',[],true);
+    document.getElementById('prox-badge').style.display = 'none';
+  }
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('f-nombre').focus();
+}
+
+function closeModal() {
+  const waMenu = document.getElementById('wa-menu');
+  if (waMenu) waMenu.style.display = 'none';
+  document.getElementById('overlay').classList.remove('open');
+  editId = null; delPhase = false;
+}
+
+function onOvClick(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function saveClient() {
+  const nombre   = getF('f-nombre').trim();
+  const telefono = getF('f-tel').trim();
+  if (!nombre)   { toast('⚠️ El nombre es obligatorio','err'); return; }
+  if (!telefono) { toast('⚠️ El teléfono es obligatorio','err'); return; }
+
+  const ownerVal = currentUser.role === 'admin' ? (document.getElementById('f-owner')?.value || currentUser.id) : currentUser.id;
+
+  const data = {
+    nombre, telefono,
+    localidad:          getF('f-localidad').trim(),
+    barrio:             getF('f-barrio').trim(),
+    presupuestoMin:     parseFloat(getF('f-pmin'))||0,
+    presupuestoMax:     parseFloat(getF('f-pmax'))||0,
+    moneda:             getF('f-moneda'),
+    operacion:          getPillVal('pg-operacion'),
+    tipoPropiedad:      getPillVals('pg-tipo'),
+    ambientes:          getF('f-ambientes'),
+    banos:              getF('f-banos'),
+    cochera:            getF('f-cochera'),
+    creditoHipotecario: getPillVal('pg-credito'),
+    financiacion:       getPillVal('pg-financiacion'),
+    etapa:              getF('f-etapa'),
+    origen:             getF('f-origen'),
+    notas:              getF('f-notas').trim(),
+    proximoContacto:    getF('f-prox-contacto'),
+    updatedAt:          new Date().toISOString(),
+    owner:              ownerVal
+  };
+
+  if (editId) {
+    const oldLead = leads.find(l=>l.id===editId);
+    if (!oldLead) return;
+
+    const oldStage = oldLead.etapa;
+    const newStage = data.etapa;
+    const seguimiento = oldLead.seguimiento ? [...oldLead.seguimiento] : [];
+
+    if (oldStage !== newStage) {
+      const now = new Date();
+      seguimiento.push({
+        id: uid(),
+        tipo: '📝 Nota',
+        texto: `🔄 Etapa actualizada de "${oldStage}" a "${newStage}"`,
+        fecha: now.toISOString().split('T')[0],
+        hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+      });
+    }
+
+    const updatedLead = { ...oldLead, ...data, seguimiento };
+    const idx = leads.findIndex(l=>l.id===editId);
+    if (idx !== -1) leads[idx] = updatedLead;
+    toast('✅ Cliente actualizado','ok');
+  } else {
+    const fechaIngreso = getF('f-fecha') || new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const newLead = {
+      id: uid(),
+      creadoEn: fechaIngreso,
+      owner: ownerVal,
+      seguimiento: [
+        {
+          id: uid(),
+          tipo: '📝 Nota',
+          texto: `🆕 Cliente registrado en etapa "${data.etapa}"`,
+          fecha: now.toISOString().split('T')[0],
+          hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+        }
+      ],
+      ...data
+    };
+    leads.unshift(newLead);
+    toast('✅ Cliente agregado','ok');
+  }
+
+  saveLeads();
+  closeModal();
+  refresh();
+}
+
+function triggerDelete() {
+  if (!delPhase) {
+    delPhase = true;
+    document.getElementById('del-confirm').style.display = 'block';
+    document.getElementById('btn-del').textContent = '⚠️ Confirmar eliminación';
+    return;
+  }
+
+  leads = leads.filter(l=>l.id!==editId);
+  saveLeads();
+  closeModal();
+  refresh();
+  toast('🗑️ Cliente eliminado','err');
+}
+
+/* ─── SEGUIMIENTO ─── */
+function renderSeguimiento(entries) {
+  const tl = document.getElementById('sgt-timeline');
+  if (!entries.length) {
+    tl.innerHTML = `<div class="sgt-empty">📝 Sin registros aún. Usá el formulario de arriba para agregar el primer seguimiento.</div>`;
+    return;
+  }
+
+  const sorted = [...entries].reverse();
+
+  tl.innerHTML = sorted.map((e, idx) => {
+    const col    = SGT_COLORS[e.tipo] || { bg:'rgba(100,100,100,.12)', color:'#666' };
+    const isLast = idx === sorted.length - 1;
+    const emoji  = e.tipo.split(' ')[0];
+    return `
+    <div class="sgt-entry">
+      <div class="sgt-line-wrap">
+        <div class="sgt-dot" style="background:${col.bg}">${emoji}</div>
+        ${!isLast ? '<div class="sgt-vline"></div>' : ''}
+      </div>
+      <div class="sgt-content">
+        <div class="sgt-header">
+          <span class="sgt-type-lbl" style="color:${col.color}">${e.tipo}</span>
+          <span class="sgt-date">${fmtDate(e.fecha)}${e.hora ? ' · ' + e.hora : ''}</span>
+          <button class="sgt-del" onclick="deleteSeguimiento('${e.id}')" title="Eliminar registro">✕</button>
+        </div>
+        ${e.texto ? `<div class="sgt-text">${e.texto}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addSeguimiento() {
+  if (!editId) return;
+  const tipo  = document.getElementById('sgt-tipo').value;
+  const texto = document.getElementById('sgt-texto').value.trim();
+  if (!texto) { toast('⚠️ Escribí una nota antes de agregar','err'); return; }
+
+  const lead = leads.find(l => l.id === editId);
+  if (!lead) return;
+  if (!lead.seguimiento) lead.seguimiento = [];
+
+  const now = new Date();
+  const newEntry = {
+    id:    uid(),
+    tipo,
+    texto,
+    fecha: now.toISOString().split('T')[0],
+    hora:  now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+  };
+
+  lead.seguimiento = [...lead.seguimiento, newEntry];
+  saveLeads();
+  renderSeguimiento(lead.seguimiento);
+  document.getElementById('sgt-texto').value = '';
+  toast(`✅ ${tipo} registrado`,'ok');
+}
+
+async function deleteSeguimiento(entryId) {
+  if (!editId) return;
+  const lead = leads.find(l => l.id === editId);
+  if (!lead || !lead.seguimiento) return;
+
+  lead.seguimiento = lead.seguimiento.filter(e => e.id !== entryId);
+  saveLeads();
+  renderSeguimiento(lead.seguimiento);
+  toast('🗑️ Registro eliminado','err');
+}
+
+/* ─── PRÓXIMO CONTACTO ─── */
+function updateProxBadge(dateStr) {
+  const badge = document.getElementById('prox-badge');
+  if (!dateStr) { badge.style.display = 'none'; return; }
+  const today = new Date().toISOString().split('T')[0];
+  badge.style.display = 'inline-block';
+  if      (dateStr < today)  { badge.className='prox-badge overdue'; badge.textContent='⚠️ Vencido'; }
+  else if (dateStr === today) { badge.className='prox-badge today';   badge.textContent='🟡 Hoy'; }
+  else                        { badge.className='prox-badge future';  badge.textContent='✅ Próximo'; }
+}
+
+/* ─── PILL HELPERS ─── */
+function pickPill(groupId, val, multi, el) {
+  if (multi) {
+    el.classList.toggle('on-teal');
+  } else {
+    document.querySelectorAll(`#${groupId} .pill`).forEach(p=>{p.classList.remove('on','on-teal');});
+    el.classList.add('on');
+  }
+}
+
+function getPillVal(groupId) {
+  const el = document.querySelector(`#${groupId} .pill.on`);
+  return el ? el.dataset.val : '';
+}
+
+function getPillVals(groupId) {
+  return [...document.querySelectorAll(`#${groupId} .pill.on, #${groupId} .pill.on-teal`)].map(el=>el.dataset.val);
+}
+
+function syncPillGroup(groupId, val, multi) {
+  const pills = document.querySelectorAll(`#${groupId} .pill`);
+  pills.forEach(p => { p.classList.remove('on','on-teal'); });
+  if (multi) {
+    const vals = Array.isArray(val) ? val : [];
+    pills.forEach(p => { if(vals.includes(p.dataset.val)) p.classList.add('on-teal'); });
+  } else {
+    pills.forEach(p => { if(p.dataset.val===val) p.classList.add('on'); });
+  }
+}
+
+/* ─── MISC HELPERS ─── */
+function getF(id) { return document.getElementById(id)?.value || ''; }
+function setF(id, val) { const el=document.getElementById(id); if(el) el.value=val; }
+
+function fmtBudget(l) {
+  if (!l.presupuestoMin && !l.presupuestoMax) return '';
+  const sym = l.moneda==='USD' ? 'USD ' : '$ ';
+  const f = n => n>=1000000 ? (n/1000000).toFixed(1)+'M' : n>=1000 ? Math.round(n/1000)+'K' : n;
+  if (l.presupuestoMin && l.presupuestoMax) return sym+f(l.presupuestoMin)+' – '+f(l.presupuestoMax);
+  return sym+f(l.presupuestoMin||l.presupuestoMax);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'2-digit'});
+}
+
+function stageBadge(e) {
+  const c = STAGE_COLOR[e]||'#55557a';
+  return `<span class="badge" style="background:${c}22;color:${c}">${e||'—'}</span>`;
+}
+
+function creditBadge(v) {
+  const m = {'Sí':'#10b981','No':'#ef4444','En trámite':'#f59e0b'};
+  const c = m[v]||'#55557a';
+  return v ? `<span class="badge" style="background:${c}22;color:${c}">${v}</span>` : '<span style="color:var(--text-d)">—</span>';
+}
+
+function proxBadgeInline(l) {
+  if (!l.proximoContacto) return '<span style="color:var(--text-d)">—</span>';
+  const today = new Date().toISOString().split('T')[0];
+  if (l.proximoContacto < today)
+    return `<span class="badge" style="background:rgba(220,38,38,.1);color:#dc2626">🔴 ${fmtDate(l.proximoContacto)}</span>`;
+  if (l.proximoContacto === today)
+    return `<span class="badge" style="background:rgba(217,119,6,.1);color:#d97706">🟡 Hoy</span>`;
+  return `<span style="color:var(--text-m);font-size:11.5px">${fmtDate(l.proximoContacto)}</span>`;
+}
+
+function updateBadges() {
+  const myLeads = getMyLeads();
+  const act = myLeads.filter(l=>!['Cerrado','Perdido'].includes(l.etapa)).length;
+  document.getElementById('bdg-pipeline').textContent = act;
+  document.getElementById('bdg-clientes').textContent = myLeads.length;
+}
+
+/* ─── TOAST ─── */
+let _tt;
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type}`; t.style.display='flex';
+  clearTimeout(_tt); _tt = setTimeout(()=>t.style.display='none', 3000);
+}
+
+/* ─── REFRESH ─── */
+function refresh() {
+  updateBadges();
+  if (view==='dashboard') renderDash();
+  if (view==='pipeline')  renderKanban();
+  if (view==='clientes')  renderTable();
+  if (view==='empleados') renderEmployees();
+  if (view==='propiedades') renderProperties();
+}
+
+/* ─── KEYBOARD ─── */
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') { 
+    closeModal(); 
+    if (typeof closePropModal === 'function') closePropModal(); 
+  }
+  const overlay = document.getElementById('overlay');
+  const overlayProp = document.getElementById('overlay-prop');
+  const isOverlayOpen = overlay && overlay.classList.contains('open');
+  const isOverlayPropOpen = overlayProp && overlayProp.classList.contains('open');
+  
+  if (e.key==='n' && !isOverlayOpen && !isOverlayPropOpen && document.activeElement.tagName!=='INPUT' && currentUser) {
+    if (view === 'propiedades' && typeof openPropModal === 'function') openPropModal();
+    else openModal();
+  }
+});
+
+/* ─── THEME TOGGLE ─── */
+function initTheme() {
+  const theme = localStorage.getItem('click24_theme') || 'light';
+  if (theme === 'dark') {
+    document.body.classList.add('dark');
+    updateThemeUI(true);
+  } else {
+    document.body.classList.remove('dark');
+    updateThemeUI(false);
+  }
+}
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('click24_theme', isDark ? 'dark' : 'light');
+  updateThemeUI(isDark);
+  if (view === 'dashboard') renderCharts();
+}
+function updateThemeUI(isDark) {
+  const icon = document.getElementById('theme-icon');
+  const text = document.getElementById('theme-text');
+  if (icon && text) {
+    icon.textContent = isDark ? '☀️' : '🌙';
+    text.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
+  }
+}
+
+/* ─── WHATSAPP TEMPLATES ─── */
+function showWaTemplates(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  const menu = document.getElementById('wa-menu');
+  if (menu.style.display === 'block') {
+    menu.style.display = 'none';
+    return;
+  }
+  
+  const rect = btn.getBoundingClientRect();
+  const menuWidth = 250;
+  let left = rect.left + window.scrollX - 100;
+  if (left + menuWidth > window.innerWidth) {
+    left = window.innerWidth - menuWidth - 14;
+  }
+  if (left < 10) {
+    left = 10;
+  }
+
+  menu.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+  menu.style.left = left + 'px';
+  menu.style.display = 'block';
+  
+  const close = () => {
+    menu.style.display = 'none';
+    document.removeEventListener('click', close);
+  };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+
+async function sendWaTemplate(templateId) {
+  const tel = document.getElementById('f-tel').value.trim();
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const barrio = document.getElementById('f-barrio').value.trim();
+  const operacion = getPillVal('pg-operacion') || 'búsqueda';
+  const tipoArray = getPillVals('pg-tipo');
+  const tipoStr = tipoArray.length ? tipoArray.join('/') : 'propiedades';
+  
+  if (!tel) {
+    toast('⚠️ Primero ingresá el teléfono del cliente', 'err');
+    return;
+  }
+  
+  let msg = '';
+  if (templateId === 1) {
+    msg = `Hola ${nombre}, ¿cómo estás? Te escribo de Propiedades Friedrich por tu interés en la ${operacion} de ${tipoStr}. ¿Cómo es tu disponibilidad para conversar brevemente hoy?`;
+  } else if (templateId === 2) {
+    const barrioText = barrio ? ` en ${barrio}` : '';
+    msg = `Hola ${nombre}, encontré unas propiedades interesantes${barrioText} que coinciden con lo que buscás para ${operacion}. Te comparto los detalles a continuación:`;
+  } else if (templateId === 3) {
+    msg = `Hola ${nombre}, ¿cómo estás? Quería consultarte si te queda bien coordinar una visita para conocer las propiedades que vimos. ¿Te vendría bien esta semana?`;
+  } else if (templateId === 4) {
+    msg = `Hola ${nombre}, te escribo de Click24...`;
+  }
+  
+  const cleanPhone = tel.replace(/\D/g, '');
+  let finalPhone = cleanPhone;
+  if (!finalPhone.startsWith('54') && finalPhone.length > 0) {
+    finalPhone = '549' + finalPhone;
+  }
+  
+  const url = `https://wa.me/${finalPhone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  
+  if (editId) {
+    const lead = leads.find(l => l.id === editId);
+    if (lead) {
+      if (!lead.seguimiento) lead.seguimiento = [];
+      const now = new Date();
+      const newEntry = {
+        id: uid(),
+        tipo: '💬 WhatsApp',
+        texto: `📤 Mensaje enviado: "${msg.length > 50 ? msg.substring(0, 47) + '...' : msg}"`,
+        fecha: now.toISOString().split('T')[0],
+        hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+      };
+      lead.seguimiento = [...lead.seguimiento, newEntry];
+      saveLeads();
+      renderSeguimiento(lead.seguimiento);
+    }
+  }
+}
+
+/* ─── MOBILE SIDEBAR TOGGLE ─── */
+function toggleSidebar(open) {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!sidebar || !backdrop) return;
+  if (open) {
+    sidebar.classList.add('open');
+    backdrop.classList.add('active');
+  } else {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('active');
+  }
+}
+
+/* ─── INIT ─── */
+initTheme();
+// Auto-login directo como Administrador
+currentUser = getLocalUsers()[0];
+appUsers = getLocalUsers();
+document.getElementById('login-overlay').style.display = 'none';
+updateUserSidebarUI();
+loadData();
+</script>
+</body>
+</html>
