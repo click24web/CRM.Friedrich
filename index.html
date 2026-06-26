@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="description" content="Click24 CRM Inmobiliario - Gestión de clientes y pipeline para Propiedades Friedrich">
   <title>Propiedades Friedrich | CRM</title>
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      const showErr = () => {
+        const div = document.createElement('div');
+        div.style.position = 'fixed';
+        div.style.top = '0';
+        div.style.left = '0';
+        div.style.width = '100%';
+        div.style.background = '#ef4444';
+        div.style.color = '#fff';
+        div.style.padding = '15px';
+        div.style.zIndex = '99999';
+        div.style.fontFamily = 'monospace';
+        div.style.fontSize = '13px';
+        div.style.whiteSpace = 'pre-wrap';
+        div.textContent = '❌ ERROR EN LA WEB:\n' + message + '\n\nArchivo: ' + source + '\nLínea: ' + lineno + ' | Columna: ' + colno;
+        document.body.appendChild(div);
+      };
+      if (document.body) showErr();
+      else window.addEventListener('DOMContentLoaded', showErr);
+      return false;
+    };
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
