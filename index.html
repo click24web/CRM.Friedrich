@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="Click24 CRM Inmobiliario - Gestión de clientes, pipeline y análisis para inmobiliarias">
-  <title>Click24 CRM | Inmobiliario</title>
+  <meta name="description" content="Click24 CRM Inmobiliario - Gestión de clientes y pipeline para Propiedades Friedrich">
+  <title>Propiedades Friedrich | CRM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -87,23 +87,21 @@
 
     .logo-wrap {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 11px;
+      text-align: center;
+      gap: 8px;
     }
 
-    .logo-icon {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--primary), #4f46e5);
-      border-radius: 11px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 900; color: #fff;
-      box-shadow: 0 4px 20px rgba(124,58,237,.4);
-      flex-shrink: 0;
-      letter-spacing: -1px;
+    .logo-wrap img {
+      width: 100%;
+      max-height: 80px;
+      object-fit: contain;
     }
 
-    .logo-text .l-name { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
-    .logo-text .l-sub  { font-size: 10px; color: var(--text-m); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+    body.dark .logo-wrap img {
+      filter: invert(0.92) contrast(1.2);
+    }
 
     .sidebar-nav { padding: 14px 10px; flex: 1; overflow-y: auto; }
 
@@ -124,12 +122,13 @@
     .nav-item.active {
       background: var(--primary-g);
       color: var(--primary-l);
-      border-color: rgba(124,58,237,.25);
+      border-color: rgba(180,145,92,.25);
+      font-weight: 600;
     }
     .nav-icon { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
     .nav-badge {
       margin-left: auto;
-      background: var(--primary);
+      background: var(--secondary);
       color: #fff;
       font-size: 10px; font-weight: 700;
       padding: 2px 7px; border-radius: 20px;
@@ -145,11 +144,26 @@
     }
     .db-dot {
       width: 7px; height: 7px; border-radius: 50%;
-      background: var(--warning); flex-shrink: 0;
-      animation: blink 2s infinite;
+      background: var(--success); flex-shrink: 0;
     }
-    .db-dot.on { background: var(--success); animation: none; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ─── USER PROFILE WIDGET ─── */
+    .user-profile-widget {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: var(--surface2);
+    }
+    .badge-role {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+    .badge-role.admin { background: rgba(180,145,92,.16); color: var(--secondary); }
 
     /* ══════════════════════════════════════
        MAIN AREA
@@ -172,7 +186,7 @@
       border-radius: var(--r-sm); padding: 8px 14px;
       flex: 1; max-width: 360px; transition: border-color var(--t);
     }
-    .search-box:focus-within { border-color: var(--primary); }
+    .search-box:focus-within { border-color: var(--secondary); }
     .search-box input {
       background: none; border: none; outline: none;
       color: var(--text); font-size: 13px; font-family: inherit; width: 100%;
@@ -188,10 +202,10 @@
       font-family: inherit; transition: all var(--t); white-space: nowrap;
     }
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary), #5b21b6);
-      color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,.35);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff; box-shadow: 0 4px 16px rgba(180,145,92,.25);
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(124,58,237,.5); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(180,145,92,.4); }
     .btn-ghost {
       background: var(--surface2); color: var(--text-m);
       border: 1px solid var(--border);
@@ -249,9 +263,7 @@
     .recent-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
     .section-hd { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
 
-    /* ══════════════════════════════════════
-       ALERTS — Para llamar hoy
-    ══════════════════════════════════════ */
+    /* ─── ALERTS ─── */
     .alerts-section { margin-bottom: 20px; }
     .alerts-grid {
       display: grid;
@@ -321,7 +333,7 @@
       min-height: 70px; border-radius: 0 0 var(--r) var(--r);
       transition: background var(--t);
     }
-    .k-cards.dov { background: rgba(124,58,237,.08); }
+    .k-cards.dov { background: rgba(180,145,92,.08); }
 
     .k-card {
       background: var(--surface2); border: 1px solid var(--border);
@@ -329,7 +341,7 @@
       cursor: pointer; transition: all var(--t);
       position: relative;
     }
-    .k-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    .k-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
     .k-card[draggable] { cursor: grab; }
     .k-card.dragging { opacity: .3; }
 
@@ -366,7 +378,7 @@
       padding: 8px 12px; outline: none; cursor: pointer;
       transition: border-color var(--t);
     }
-    .filter-sel:focus { border-color: var(--primary); }
+    .filter-sel:focus { border-color: var(--secondary); }
 
     .tbl-wrap {
       background: var(--surface); border: 1px solid var(--border);
@@ -382,9 +394,9 @@
     }
     td { padding: 12px 13px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,.02); }
+    tr:hover td { background: rgba(255,255,255,.01); }
     .td-name { font-weight: 700; }
-    .td-phone a { color: var(--secondary); text-decoration: none; }
+    .td-phone a { color: var(--secondary); text-decoration: none; font-weight: 500; }
     .td-phone a:hover { text-decoration: underline; }
     .td-acts { display: flex; gap: 5px; }
 
@@ -499,7 +511,7 @@
     }
     .wa-menu-item:hover {
       background: var(--surface2);
-      color: var(--primary);
+      color: var(--secondary);
     }
 
     /* ── FORM ── */
@@ -527,7 +539,7 @@
       transition: border-color var(--t), box-shadow var(--t);
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
+      border-color: var(--secondary);
       box-shadow: 0 0 0 3px var(--primary-g);
     }
     textarea { resize: vertical; min-height: 75px; }
@@ -545,8 +557,8 @@
       transition: all var(--t); user-select: none; font-weight: 500;
     }
     .pill:hover { border-color: var(--border2); color: var(--text); }
-    .pill.on { background: var(--primary-g); border-color: rgba(124,58,237,.45); color: var(--primary-l); font-weight: 700; }
-    .pill.on-teal { background: rgba(6,182,212,.1); border-color: rgba(6,182,212,.35); color: var(--secondary); font-weight: 700; }
+    .pill.on { background: var(--primary-g); border-color: rgba(180,145,92,.45); color: var(--secondary); font-weight: 700; }
+    .pill.on-teal { background: rgba(180,145,92,.1); border-color: rgba(180,145,92,.35); color: var(--secondary); font-weight: 700; }
 
     /* delete confirm */
     .del-confirm {
@@ -570,7 +582,7 @@
     .toast.err { border-color: var(--danger); color: var(--danger); }
 
     /* ══════════════════════════════════════
-       PRÓXIMO CONTACTO — badge inline
+       PRÓXIMO CONTACTO
     ══════════════════════════════════════ */
     .prox-wrap { display: flex; align-items: center; gap: 8px; }
     .prox-badge {
@@ -598,7 +610,7 @@
       padding: 7px 10px; outline: none; cursor: pointer;
       transition: border-color var(--t), box-shadow var(--t);
     }
-    .sgt-type-sel:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-g); }
+    .sgt-type-sel:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px var(--primary-g); }
     .sgt-txt-input {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r-sm); color: var(--text);
@@ -606,7 +618,7 @@
       padding: 7px 10px; outline: none; width: 100%;
       transition: border-color var(--t), box-shadow var(--t);
     }
-    .sgt-txt-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-g); }
+    .sgt-txt-input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px var(--primary-g); }
 
     .sgt-timeline { display: flex; flex-direction: column; }
 
@@ -646,269 +658,6 @@
       text-align: center; padding: 22px; color: var(--text-d);
       font-size: 12px; background: var(--surface2);
       border-radius: var(--r-sm); border: 1px dashed var(--border2);
-    }
-
-    /* ─── LOGIN OVERLAY ─── */
-    .login-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 2500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .login-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 400px;
-      padding: 32px 28px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.08);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    body.dark .login-card {
-      box-shadow: 0 10px 40px rgba(0,0,0,.4);
-    }
-    .login-logo {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-    .login-logo img {
-      max-height: 80px;
-      object-fit: contain;
-    }
-    body.dark .login-logo img, body.dark .sidebar-logo img {
-      filter: invert(0.92) contrast(1.2);
-    }
-    .login-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-      text-align: center;
-    }
-    .login-field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .login-field label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-m);
-    }
-    .login-info-box {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 12px;
-      font-size: 11px;
-      color: var(--text-m);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .login-info-title {
-      font-weight: 700;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ─── USER PROFILE BAR WIDGET ─── */
-    .user-profile-widget {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      background: var(--surface2);
-    }
-    .badge-role {
-      font-size: 9.5px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      width: fit-content;
-    }
-    .badge-role.admin { background: rgba(180,145,92,.16); color: var(--secondary); }
-    .badge-role.user { background: rgba(75,85,99,.12); color: var(--text-m); }
-
-    /* ─── PROPERTIES CATALOGUE ─── */
-    .properties-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-    .prop-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      transition: transform var(--t), border-color var(--t);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-    .prop-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--border2);
-      box-shadow: var(--shadow);
-    }
-    .prop-img-container {
-      height: 160px;
-      background: var(--surface3);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .prop-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform .5s ease;
-    }
-    .prop-card:hover .prop-img {
-      transform: scale(1.05);
-    }
-    .prop-badge-op {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      font-size: 9.5px;
-      font-weight: 700;
-      color: #fff;
-      padding: 3px 8px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.15);
-    }
-    .prop-badge-op.venta { background: var(--primary); }
-    .prop-badge-op.alquiler { background: var(--secondary); }
-    .prop-badge-op.temporario { background: var(--orange); }
-    
-    .prop-info {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
-    }
-    .prop-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .prop-price {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--success);
-    }
-    .prop-meta-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11.5px;
-      color: var(--text-m);
-      margin-top: 4px;
-    }
-    .prop-meta-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .prop-footer {
-      border-top: 1px solid var(--border);
-      padding: 10px 16px;
-      background: var(--surface2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .prop-barrio {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-d);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ─── MATCHMAKING SECTIONS ─── */
-    .match-section {
-      background: rgba(180,145,92,.06);
-      border: 1px dashed rgba(180,145,92,.35);
-      border-radius: var(--r-sm);
-      padding: 16px;
-      margin-top: 20px;
-    }
-    body.dark .match-section {
-      background: rgba(180,145,92,.03);
-    }
-    .match-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .match-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .match-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 12px;
-    }
-    .match-item-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .match-item-title {
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .match-item-meta {
-      font-size: 10.5px;
-      color: var(--text-m);
-      margin-top: 2px;
-    }
-    .match-item-price {
-      font-weight: 700;
-      color: var(--success);
-      white-space: nowrap;
-    }
-    .match-empty {
-      font-size: 11.5px;
-      color: var(--text-d);
-      text-align: center;
-      padding: 10px 0;
     }
 
     /* ─── RESPONSIVE MOBILE ─── */
@@ -1022,7 +771,7 @@
       }
       #fi-orden {
         grid-column: 1 / -1;
-        border-color: var(--primary);
+        border-color: var(--secondary);
       }
       
       .f-grid, .f-grid.c3 {
@@ -1076,55 +825,20 @@
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div class="login-overlay" id="login-overlay" style="display: none;">
-  <div class="login-card">
-    <div class="login-logo">
-      <img src="logo.jpg" alt="Propiedades Friedrich">
-    </div>
-    <div class="login-title">Propiedades Friedrich CRM</div>
-    
-    <form onsubmit="login(event)" style="display: flex; flex-direction: column; gap: 14px;">
-      <div class="login-field">
-        <label>Usuario o Correo Electrónico</label>
-        <input type="text" id="login-email" required placeholder="Ej: Prueba" style="background: var(--surface2); border: 1px solid var(--border);">
-      </div>
-      <div class="login-field">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" required placeholder="••••••••" style="background: var(--surface2); border: 1px solid var(--border);">
-      </div>
-      
-      <button type="submit" class="btn btn-primary" style="justify-content: center; padding: 12px; margin-top: 6px;">Ingresar</button>
-    </form>
-    
-    <div class="login-info-box">
-      <div class="login-info-title">🔑 Credenciales de Acceso</div>
-      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:18px">👑</span>
-        <div>
-          <div style="font-weight:700;">Administrador</div>
-          <div style="color:var(--text-m);font-size:13px;">Usuario: <strong>Prueba</strong> &nbsp;|&nbsp; Contraseña: <strong>1234</strong></div>
-        </div>
-      </div>
-      <div style="margin-top:8px;font-size:12px;color:var(--text-d);">💡 El admin puede crear nuevos empleados desde la sección Empleados</div>
-    </div>
-  </div>
-</div>
-
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
-  <div class="sidebar-logo" style="padding: 18px 14px 12px; border-bottom: 1px solid var(--border);">
-    <div class="logo-wrap" style="flex-direction: column; align-items: center; text-align: center; gap: 8px;">
-      <img src="logo.jpg" alt="Propiedades Friedrich" style="width: 100%; max-height: 80px; object-fit: contain;">
+  <div class="sidebar-logo">
+    <div class="logo-wrap">
+      <img src="logo.jpg" alt="Propiedades Friedrich">
     </div>
   </div>
 
   <!-- PERFIL USUARIO ACTIVO -->
   <div class="user-profile-widget">
-    <div id="user-name-lbl" style="font-size: 13px; font-weight: 700; color: var(--text);">...</div>
-    <div id="user-role-lbl" class="badge-role user">...</div>
+    <div style="font-size: 13px; font-weight: 700; color: var(--text);">Propiedades Friedrich</div>
+    <div class="badge-role admin">👑 Administrador</div>
   </div>
 
   <nav class="sidebar-nav">
@@ -1140,21 +854,15 @@
       <span class="nav-icon">👥</span> Clientes
       <span class="nav-badge" id="bdg-clientes">0</span>
     </div>
-    <div class="nav-item" id="nav-empleados" onclick="setView('empleados')" style="display: none;">
-      <span class="nav-icon">💼</span> Empleados
-    </div>
   </nav>
 
   <div class="sidebar-footer">
-    <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--danger); color: var(--danger); background: rgba(220,38,38,.03);">
-      🚪 Cerrar Sesión
-    </button>
     <button class="btn btn-ghost btn-sm" id="theme-toggle" onclick="toggleTheme()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--border2);">
       <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
     </button>
     <div class="db-badge">
-      <div class="db-dot on" id="db-dot"></div>
-      <span id="db-txt">Supabase Activo</span>
+      <div class="db-dot" id="db-dot"></div>
+      <span id="db-txt">💾 Base de Datos Local</span>
     </div>
   </div>
 </aside>
@@ -1258,7 +966,7 @@
         <option value="USD">USD</option>
         <option value="ARS">ARS</option>
       </select>
-      <select class="filter-sel" id="fi-orden" onchange="renderTable()" style="margin-left: auto; border-color: var(--primary);">
+      <select class="filter-sel" id="fi-orden" onchange="renderTable()" style="margin-left: auto; border-color: var(--secondary);">
         <option value="creadoEn_desc">📅 Más nuevos primero</option>
         <option value="creadoEn_asc">📅 Más viejos primero</option>
         <option value="budget_desc">💵 Presupuesto: Mayor a menor</option>
@@ -1288,35 +996,10 @@
         <tbody id="tbl-body"></tbody>
       </table>
     </div>
-  <!-- ── EMPLEADOS ── -->
-  <div class="view" id="view-empleados">
-    <div class="page-hd">
-      <div>
-        <div class="page-title">Empleados / Asesores</div>
-        <div class="page-sub" id="emp-count">0 empleados registrados</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary" onclick="openEmpModal()">＋ Nuevo Empleado</button>
-      </div>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Usuario / Email</th>
-            <th>Contraseña</th>
-            <th>Rol</th>
-            <th>Clientes a cargo</th>
-          </tr>
-        </thead>
-        <tbody id="emp-tbl-body"></tbody>
-      </table>
-    </div>
   </div>
 </main>
 
-<!-- ══ MODAL ══ -->
+<!-- ══ MODAL DE CLIENTE ══ -->
 <div class="overlay" id="overlay" onclick="onOvClick(event)">
   <div class="modal">
     <div class="modal-hd">
@@ -1337,7 +1020,7 @@
           <div class="f-group">
             <label>Teléfono de Contacto *</label>
             <div style="display: flex; gap: 6px;">
-              <input type="tel" id="f-tel" placeholder="Ej: 11-5555-1234" style="flex: 1;">
+              <input type="tel" id="f-tel" placeholder="Ej: 1155551234" style="flex: 1;">
               <button class="btn btn-ghost btn-sm" id="btn-wa-templates" onclick="showWaTemplates(event)" style="padding: 0 10px; color: #25d366; border-color: rgba(37,211,102,.3); background: rgba(37,211,102,.05);" title="Plantillas de WhatsApp">
                 💬 Plantillas
               </button>
@@ -1367,7 +1050,7 @@
             </div>
           </div>
           <div class="f-group f-full">
-            <label>Tipo de Propiedad (puede ser más de uno)</label>
+            <label>Tipo de Propiedad (múltiple)</label>
             <div class="pill-group" id="pg-tipo">
               <div class="pill" data-val="Departamento" onclick="pickPill('pg-tipo','Departamento',true,this)">🏢 Depto</div>
               <div class="pill" data-val="Casa" onclick="pickPill('pg-tipo','Casa',true,this)">🏠 Casa</div>
@@ -1471,10 +1154,6 @@
               <span class="prox-badge" id="prox-badge" style="display:none"></span>
             </div>
           </div>
-          <div class="f-group f-full" id="f-owner-group" style="display:none;">
-            <label>Asesor Asignado</label>
-            <select id="f-owner" style="width:100%;"></select>
-          </div>
           <div class="f-group f-full">
             <label>Observaciones / Notas</label>
             <textarea id="f-notas" placeholder="Anotá detalles importantes, preferencias, próximos pasos..."></textarea>
@@ -1482,7 +1161,7 @@
         </div>
       </div>
 
-      <!-- SEGUIMIENTO (solo al editar) -->
+      <!-- SEGUIMIENTO TIMELINE (Solo en edición) -->
       <div class="f-section" id="sgt-section" style="display:none">
         <div class="f-section-title">🗂️ Historial de Seguimiento</div>
         <div class="sgt-add-form">
@@ -1495,15 +1174,12 @@
             <option value="📝 Nota">📝 Nota</option>
           </select>
           <input class="sgt-txt-input" type="text" id="sgt-texto"
-            placeholder="Ej: Llamé, no contestó. Reintentar el lunes..."
+            placeholder="Ej: Conversamos, le interesa visitar Palermo..."
             onkeydown="if(event.key==='Enter'){addSeguimiento();event.preventDefault();}">
           <button class="btn btn-primary btn-sm" onclick="addSeguimiento()">＋ Agregar</button>
         </div>
         <div class="sgt-timeline" id="sgt-timeline"></div>
       </div>
-
-      <!-- CRUCE INTELIGENTE REMOVED -->
-
     </div>
 
     <div class="modal-ft">
@@ -1514,60 +1190,16 @@
   </div>
 </div>
 
-<!-- PROPIEDAD MODAL / DRAWER REMOVED -->
-
 <!-- TOAST -->
 <div id="toast" style="display:none" class="toast"></div>
 
-<!-- LOGIN OVERLAY DELETED (DUPLICATE) -->
-
-<!-- WA MENU -->
+<!-- WA TEMPLATE MENU -->
 <div id="wa-menu" class="wa-menu" style="display: none;">
   <div class="wa-menu-title">Seleccionar Plantilla</div>
   <div class="wa-menu-item" onclick="sendWaTemplate(1)">👋 Presentación / Contacto</div>
   <div class="wa-menu-item" onclick="sendWaTemplate(2)">🏠 Propuestas Encontradas</div>
   <div class="wa-menu-item" onclick="sendWaTemplate(3)">📅 Coordinar Visita</div>
   <div class="wa-menu-item" onclick="sendWaTemplate(4)">💬 Mensaje Directo</div>
-</div>
-
-<!-- ══ EMPLEADO MODAL / DRAWER ══ -->
-<div class="overlay" id="overlay-emp" onclick="onEmpOvClick(event)">
-  <div class="modal" style="max-width: 450px;">
-    <div class="modal-hd">
-      <div class="modal-title" id="modal-emp-ttl">Nuevo Empleado</div>
-      <button class="modal-close" onclick="closeEmpModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="f-section">
-        <div class="f-section-title">👤 Datos del Asesor</div>
-        <div class="f-grid">
-          <div class="f-group f-full">
-            <label>Nombre Completo *</label>
-            <input type="text" id="fe-nombre" placeholder="Ej: Carlos Asesor" required>
-          </div>
-          <div class="f-group f-full">
-            <label>Usuario o Correo Electrónico *</label>
-            <input type="text" id="fe-email" placeholder="Ej: carlos@friedrich.com o CarlosAsesor" required>
-          </div>
-          <div class="f-group f-full">
-            <label>Contraseña *</label>
-            <input type="password" id="fe-pass" placeholder="Mínimo 4 caracteres" required>
-          </div>
-          <div class="f-group f-full">
-            <label>Rol de Acceso</label>
-            <select id="fe-role">
-              <option value="user">💼 Asesor Inmobiliario (Vendedor)</option>
-              <option value="admin">👑 Administrador (Admin)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeEmpModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEmployee()">💾 Guardar</button>
-    </div>
-  </div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -1597,112 +1229,101 @@ const SGT_COLORS = {
   '📝 Nota':      { bg: 'rgba(139,92,246,.14)',  color: '#8b5cf6' }
 };
 
+const KEY = 'friedrich_leads_v2';
+
+/* ─── SUPABASE INTEGRATION ─── */
 const supabaseUrl = 'https://piuhuwkkgdfzyukhngli.supabase.co';
 const supabaseKey = 'sb_publishable_OriN8olSNsIPo6lysdUCnQ_j_SoMT0d';
-const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+const supabase = (window.supabase && typeof window.supabase.createClient === 'function') ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+// Conversión de Lead JS a Fila Supabase (columnas en minúscula)
+function leadToRow(l) {
+  return {
+    id: l.id,
+    nombre: l.nombre || '',
+    telefono: l.telefono || '',
+    owner: l.owner || 'admin',
+    localidad: l.localidad || '',
+    barrio: l.barrio || '',
+    operacion: l.operacion || '',
+    tipopropiedad: l.tipoPropiedad || [],
+    ambientes: l.ambientes || '',
+    cochera: l.cochera || '',
+    presupuestomin: parseFloat(l.presupuestoMin) || 0,
+    presupuestomax: parseFloat(l.presupuestoMax) || 0,
+    moneda: l.moneda || 'USD',
+    creditohipotecario: l.creditoHipotecario || '',
+    financiacion: l.financiacion || '',
+    etapa: l.etapa || 'Nuevo',
+    origen: l.origen || '',
+    notas: l.notas || '',
+    creadoen: l.creadoEn || new Date().toISOString().split('T')[0],
+    proximocontacto: l.proximoContacto || '',
+    seguimiento: l.seguimiento || [],
+    updatedat: l.updatedAt || new Date().toISOString()
+  };
+}
+
+// Conversión de Fila Supabase a Lead JS (camelCase)
+function rowToLead(r) {
+  return {
+    id: r.id,
+    nombre: r.nombre,
+    telefono: r.telefono,
+    owner: r.owner || 'admin',
+    localidad: r.localidad || '',
+    barrio: r.barrio || '',
+    operacion: r.operacion || '',
+    tipoPropiedad: r.tipopropiedad || [],
+    ambientes: r.ambientes || '',
+    banos: '', // no está en base de datos
+    cochera: r.cochera || '',
+    presupuestoMin: r.presupuestomin || 0,
+    presupuestoMax: r.presupuestomax || 0,
+    moneda: r.moneda || 'USD',
+    creditoHipotecario: r.creditohipotecario || '',
+    financiacion: r.financiacion || '',
+    etapa: r.etapa || 'Nuevo',
+    origen: r.origen || '',
+    notas: r.notas || '',
+    creadoEn: r.creadoen || '',
+    proximoContacto: r.proximocontacto || '',
+    seguimiento: r.seguimiento || [],
+    updatedAt: r.updatedat || ''
+  };
+}
+
+function updateDbStatus(status) {
+  const dot = document.getElementById('db-dot');
+  const txt = document.getElementById('db-txt');
+  if (!dot || !txt) return;
+
+  if (status === 'connecting') {
+    dot.className = 'db-dot';
+    dot.style.background = 'var(--warning)';
+    txt.textContent = '🔌 Conectando a Supabase...';
+  } else if (status === 'online') {
+    dot.className = 'db-dot';
+    dot.style.background = 'var(--success)';
+    txt.textContent = '🟢 Supabase Online';
+  } else if (status === 'offline_backup') {
+    dot.className = 'db-dot';
+    dot.style.background = 'var(--orange)';
+    txt.textContent = '⚠️ Sin conexión (Modo Respaldo)';
+  } else if (status === 'local_only') {
+    dot.className = 'db-dot';
+    dot.style.background = 'var(--text-d)';
+    txt.textContent = '💾 Base de Datos Local';
+  }
+}
 
 /* ─── STATE ─── */
-let leads       = [];
-let properties  = [];
-let view        = 'dashboard';
-let editId      = null;
-let q           = '';
-let delPhase    = false;
-let dragId      = null;
-let currentUser = null;
-let appUsers    = [];
-
-/* ─── AUTHENTICATION (localStorage-first, Supabase optional) ─── */
-
-// Usuarios por defecto si no hay ninguno guardado
-const DEFAULT_USERS = [
-  { id: 'admin_prueba', nombre: 'Administrador', email: 'Prueba', pass: '1234', role: 'admin' }
-];
-
-function getLocalUsers() {
-  try {
-    const raw = localStorage.getItem('friedrich_users');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch(e) {}
-  // Primera vez: guardar usuarios por defecto
-  localStorage.setItem('friedrich_users', JSON.stringify(DEFAULT_USERS));
-  return DEFAULT_USERS;
-}
-
-function saveLocalUsers(users) {
-  localStorage.setItem('friedrich_users', JSON.stringify(users));
-}
-
-function checkLogin() {
-  const session = sessionStorage.getItem('friedrich_session');
-  if (session) {
-    const users = getLocalUsers();
-    const user = users.find(u => u.email.toLowerCase() === session.toLowerCase());
-    if (user) {
-      currentUser = user;
-      appUsers = users;
-      document.getElementById('login-overlay').style.display = 'none';
-      updateUserSidebarUI();
-      loadData();
-      return;
-    }
-  }
-  document.getElementById('login-overlay').style.display = 'flex';
-}
-
-function login(e) {
-  if (e) e.preventDefault();
-  const emailInput = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-
-  const users = getLocalUsers();
-  const user = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase() && u.pass === pass);
-
-  if (user) {
-    sessionStorage.setItem('friedrich_session', user.email);
-    currentUser = user;
-    appUsers = users;
-    document.getElementById('login-overlay').style.display = 'none';
-    updateUserSidebarUI();
-    toast(`👋 Bienvenido, ${currentUser.nombre}!`, 'ok');
-    loadData();
-  } else {
-    toast('⚠️ Usuario o contraseña incorrectos', 'err');
-    document.getElementById('login-pass').value = '';
-    document.getElementById('login-pass').focus();
-  }
-}
-
-function logout() {
-  sessionStorage.removeItem('friedrich_session');
-  currentUser = null;
-  document.getElementById('login-overlay').style.display = 'flex';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-pass').value = '';
-}
-
-function updateUserSidebarUI() {
-  const uName = document.getElementById('user-name-lbl');
-  const uRole = document.getElementById('user-role-lbl');
-  if (uName && uRole) {
-    uName.textContent = currentUser.nombre;
-    uRole.textContent = currentUser.role === 'admin' ? '👑 Administrador' : '💼 Asesor Inmobiliario';
-    uRole.className = currentUser.role === 'admin' ? 'badge-role admin' : 'badge-role user';
-  }
-  const navEmpleados = document.getElementById('nav-empleados');
-  if (navEmpleados) {
-    navEmpleados.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
-  }
-}
-
-function getMyLeads() {
-  if (!currentUser) return [];
-  if (currentUser.role === 'admin') return leads;
-  return leads.filter(l => l.owner === currentUser.id);
-}
+let leads    = [];
+let view     = 'dashboard';
+let editId   = null;
+let q        = '';
+let delPhase = false;
+let dragId   = null;
 
 /* ─── SEED DATA ─── */
 function seed() {
@@ -1710,7 +1331,7 @@ function seed() {
   const fut = d => { const x = new Date(); x.setDate(x.getDate()+d); return x.toISOString().split('T')[0]; };
   return [
     {
-      id: uid(), nombre:'Carlos Gómez', telefono:'11-5487-9821', owner: 'vendedor1',
+      id: uid(), nombre:'Carlos Gómez', telefono:'11-5487-9821',
       localidad:'CABA', barrio:'Palermo', operacion:'Compra',
       tipoPropiedad:['Departamento'], ambientes:'3', cochera:'Sí',
       presupuestoMin:300000, presupuestoMax:450000, moneda:'USD',
@@ -1725,7 +1346,7 @@ function seed() {
       ]
     },
     {
-      id: uid(), nombre:'María Laura Fernández', telefono:'11-3214-5566', owner: 'vendedor1',
+      id: uid(), nombre:'María Laura Fernández', telefono:'11-3214-5566',
       localidad:'CABA', barrio:'Belgrano', operacion:'Compra',
       tipoPropiedad:['Casa'], ambientes:'4', cochera:'Sí',
       presupuestoMin:500000, presupuestoMax:700000, moneda:'USD',
@@ -1739,7 +1360,7 @@ function seed() {
       ]
     },
     {
-      id: uid(), nombre:'Julián Álvarez', telefono:'11-9876-5432', owner: 'vendedor2',
+      id: uid(), nombre:'Julián Álvarez', telefono:'11-9876-5432',
       localidad:'GBA Norte', barrio:'Vicente López', operacion:'Compra',
       tipoPropiedad:['PH','Departamento'], ambientes:'2', cochera:'No',
       presupuestoMin:150000, presupuestoMax:250000, moneda:'USD',
@@ -1750,7 +1371,7 @@ function seed() {
       seguimiento: []
     },
     {
-      id: uid(), nombre:'Sofía Rossi', telefono:'11-6543-2109', owner: 'vendedor2',
+      id: uid(), nombre:'Sofía Rossi', telefono:'11-6543-2109',
       localidad:'CABA', barrio:'Recoleta', operacion:'Alquiler',
       tipoPropiedad:['Departamento'], ambientes:'2', cochera:'Indistinto',
       presupuestoMin:400000, presupuestoMax:600000, moneda:'ARS',
@@ -1764,20 +1385,20 @@ function seed() {
       ]
     },
     {
-      id: uid(), nombre:'Roberto Peralta', telefono:'11-2345-6789', owner: 'vendedor1',
+      id: uid(), nombre:'Roberto Peralta', telefono:'11-2345-6789',
       localidad:'CABA', barrio:'Centro', operacion:'Compra',
       tipoPropiedad:['Local','Oficina'], ambientes:'', cochera:'No',
       presupuestoMin:100000, presupuestoMax:200000, moneda:'USD',
       creditoHipotecario:'No', financiacion:'Cuotas',
       etapa:'Contactado', origen:'Búsqueda Directa',
-      notas:'Inversor buscando local comercial.', creadoEn:ago(7),
+      notes:'', creadoEn:ago(7),
       proximoContacto: fut(3),
       seguimiento: [
         { id:uid(), tipo:'📞 Llamada', texto:'Inversor serio. Quiere locales en Microcentro y San Telmo.', fecha:ago(7), hora:'12:00' },
       ]
     },
     {
-      id: uid(), nombre:'Lucía Castro', telefono:'11-8765-4321', owner: 'vendedor2',
+      id: uid(), nombre:'Lucía Castro', telefono:'11-8765-4321',
       localidad:'GBA Norte', barrio:'Olivos', operacion:'Compra',
       tipoPropiedad:['Casa'], ambientes:'3', cochera:'Sí',
       presupuestoMin:350000, presupuestoMax:450000, moneda:'USD',
@@ -1793,66 +1414,160 @@ function seed() {
 }
 function uid() { return 'L-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
 
-function seedProps() {
-  return [
-    { id: 'P-1', titulo: 'Depto de 3 amb con balcón', operacion: 'Compra', tipo: 'Departamento', barrio: 'Palermo', precio: 320000, moneda: 'USD', ambientes: '3', banos: '2', cochera: 'Cubierta', notas: 'Piso alto, súper luminoso.' },
-    { id: 'P-2', titulo: 'Casa de 4 amb con jardín', operacion: 'Compra', tipo: 'Casa', barrio: 'Belgrano', precio: 620000, moneda: 'USD', ambientes: '4', banos: '3', cochera: 'Cubierta', notas: 'Excelente ubicación, pileta.' },
-    { id: 'P-3', titulo: 'PH 2 ambientes sin expensas', operacion: 'Compra', tipo: 'PH', barrio: 'Palermo', precio: 175000, moneda: 'USD', ambientes: '2', banos: '1', cochera: 'No tiene', notas: 'Reciclado a nuevo, patio.' },
-    { id: 'P-4', titulo: 'Depto 2 amb amueblado', operacion: 'Alquiler', tipo: 'Departamento', barrio: 'Palermo', precio: 450000, moneda: 'ARS', ambientes: '2', banos: '1', cochera: 'No tiene', notas: 'Alquiler temporario o tradicional.' }
-  ];
-}
+/* ─── DATA PERSISTENCE ─── */
+let isRealtimeInitialized = false;
 
-/* ─── STORAGE ─── */
-/* ─── DATA LOADING (localStorage-first) ─── */
-function loadData() {
-  if (!currentUser) return;
-  // Cargar leads desde localStorage
+async function loadData() {
+  // 1. CARGA LOCAL INMEDIATA (Optimistic Load)
+  // Intentamos leer del almacenamiento local de inmediato para que la web no se bloquee ni quede en blanco
   try {
-    const raw = localStorage.getItem('friedrich_leads');
-    leads = raw ? JSON.parse(raw) : [];
-  } catch(e) { leads = []; }
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        leads = parsed;
+      }
+    }
+  } catch(e) {
+    console.error('Error al cargar datos iniciales de localStorage', e);
+  }
 
-  // Cargar propiedades desde localStorage
-  try {
-    const rawP = localStorage.getItem('friedrich_props');
-    properties = rawP ? JSON.parse(rawP) : [];
-  } catch(e) { properties = []; }
-
-  // Si no hay leads y es admin, sembrar datos de ejemplo
-  if (leads.length === 0 && currentUser.role === 'admin') {
+  // Si no había nada en localStorage, cargamos la semilla local para que haya contenido
+  if (leads.length === 0) {
     leads = seed();
-    saveLeads();
+    saveData();
   }
 
-  // Si no hay propiedades, sembrar propiedades de ejemplo
-  if (properties.length === 0 && currentUser.role === 'admin') {
-    properties = seedProps();
-    saveProps();
-  }
-
-  // Cargar usuarios
-  appUsers = getLocalUsers();
-
+  // Refrescamos la UI de inmediato
   refresh();
+  updateDbStatus('connecting');
+
+  // 2. CONEXIÓN ASÍNCRONA CON SUPABASE
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .select('*');
+        
+      if (error) throw error;
+      
+      if (data) {
+        if (data.length === 0) {
+          // Si Supabase está vacío, subimos los datos locales que ya tenemos
+          console.log('Subiendo datos locales a Supabase vacío...');
+          for (const lead of leads) {
+            await saveLeadToSupabase(lead, true);
+          }
+          toast('💾 Sincronizados clientes locales con la nube', 'ok');
+        } else {
+          // Si Supabase tiene datos, los cargamos y reemplazamos los locales
+          leads = data.map(rowToLead);
+        }
+        
+        // Re-renderizamos la UI con los datos oficiales de la nube
+        refresh();
+        updateDbStatus('online');
+        localStorage.setItem(KEY, JSON.stringify(leads));
+        
+        if (!isRealtimeInitialized) {
+          initRealtime();
+          isRealtimeInitialized = true;
+        }
+      }
+    } catch (e) {
+      console.error('Error cargando de Supabase, usando respaldo local:', e);
+      updateDbStatus('offline_backup');
+      toast('⚠️ Usando base de datos local (Sin conexión)', 'warning');
+    }
+  } else {
+    updateDbStatus('local_only');
+  }
 }
 
-function saveLeads() {
-  localStorage.setItem('friedrich_leads', JSON.stringify(leads));
+function saveData() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(leads));
+  } catch(e) {
+    console.error('Error al guardar datos en localStorage', e);
+  }
 }
 
-function saveProps() {
-  localStorage.setItem('friedrich_props', JSON.stringify(properties));
+async function saveLeadToSupabase(l, silent = false) {
+  if (!supabase) return;
+  try {
+    const row = leadToRow(l);
+    const { error } = await supabase
+      .from('leads')
+      .upsert(row);
+      
+    if (error) throw error;
+  } catch (e) {
+    console.error('Error al guardar en Supabase:', e);
+    if (!silent) {
+      toast('⚠️ Guardado localmente (Sin conexión)', 'warning');
+    }
+  }
 }
 
-// Helper: obtener nombre del dueño por id
-function getOwnerName(ownerId) {
-  const u = appUsers.find(u => u.id === ownerId);
-  return u ? u.nombre : (ownerId || 'Sin asignar');
+async function deleteLeadFromSupabase(id) {
+  if (!supabase) return;
+  try {
+    const { error } = await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id);
+      
+    if (error) throw error;
+  } catch (e) {
+    console.error('Error al borrar de Supabase:', e);
+    toast('⚠️ Borrado localmente (Sin conexión)', 'warning');
+  }
 }
 
-// Alias para compatibilidad con código existente
-async function loadFromSupabase() {
-  loadData();
+function initRealtime() {
+  if (!supabase) return;
+  
+  supabase
+    .channel('leads-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'leads' },
+      (payload) => {
+        console.log('Cambio en tiempo real:', payload);
+        
+        if (payload.eventType === 'INSERT') {
+          const newLead = rowToLead(payload.new);
+          if (!leads.some(l => l.id === newLead.id)) {
+            leads.unshift(newLead);
+            localStorage.setItem(KEY, JSON.stringify(leads));
+            refresh();
+          }
+        } else if (payload.eventType === 'UPDATE') {
+          const updatedLead = rowToLead(payload.new);
+          const idx = leads.findIndex(l => l.id === updatedLead.id);
+          if (idx !== -1) {
+            leads[idx] = updatedLead;
+            localStorage.setItem(KEY, JSON.stringify(leads));
+            refresh();
+            if (editId === updatedLead.id) {
+              renderSeguimiento(updatedLead.seguimiento);
+            }
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const deletedId = payload.old.id;
+          if (leads.some(l => l.id === deletedId)) {
+            leads = leads.filter(l => l.id !== deletedId);
+            localStorage.setItem(KEY, JSON.stringify(leads));
+            refresh();
+            if (editId === deletedId) {
+              closeModal();
+              toast('⚠️ El cliente en edición fue eliminado por otro usuario', 'err');
+            }
+          }
+        }
+      }
+    )
+    .subscribe();
 }
 
 /* ─── NAVIGATION ─── */
@@ -1862,7 +1577,7 @@ function setView(v) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('nav-'+v).classList.add('active');
-  document.getElementById('topbar-title').textContent = {dashboard:'Dashboard',pipeline:'Pipeline',clientes:'Clientes',empleados:'Empleados'}[v];
+  document.getElementById('topbar-title').textContent = {dashboard:'Dashboard',pipeline:'Pipeline',clientes:'Clientes'}[v];
   
   toggleSidebar(false);
   refresh();
@@ -1873,7 +1588,6 @@ function onSearch(val) {
   q = val.toLowerCase().trim();
   if (view === 'clientes') renderTable();
   if (view === 'dashboard') renderDash();
-  if (view === 'propiedades') renderProperties();
 }
 
 function matchQuery(value, query) {
@@ -1890,7 +1604,7 @@ function matchQuery(value, query) {
   // Intercambio inteligente de "compra" y "venta"
   if ((qClean === 'venta' || qClean === 'compra') && (t === 'compra' || t === 'venta')) return true;
   
-  // Normalización simple plural/singular (ej: "lotes" busca "lote", "departamentos" busca "departamento")
+  // Normalización simple plural/singular
   if (qClean.endsWith('s') && qClean.length > 3) {
     const singularQ = qClean.slice(0, -1);
     if (t.includes(singularQ)) return true;
@@ -1904,9 +1618,8 @@ function matchQuery(value, query) {
 }
 
 function filtered() {
-  const myLeads = getMyLeads();
-  if (!q) return myLeads;
-  return myLeads.filter(l =>
+  if (!q) return leads;
+  return leads.filter(l =>
     matchQuery(l.nombre, q) ||
     matchQuery(l.telefono, q) ||
     matchQuery(l.barrio, q) ||
@@ -1918,22 +1631,21 @@ function filtered() {
 
 /* ─── DASHBOARD ─── */
 function renderDash() {
-  const myLeads = getMyLeads();
-  const tot  = myLeads.length;
+  const tot  = leads.length;
   const now  = new Date();
-  const mes  = myLeads.filter(l => {
+  const mes  = leads.filter(l => {
     const d = new Date(l.creadoEn||0);
     return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
   }).length;
-  const proc = myLeads.filter(l => !['Cerrado','Perdido'].includes(l.etapa)).length;
-  const cer  = myLeads.filter(l => l.etapa==='Cerrado').length;
+  const proc = leads.filter(l => !['Cerrado','Perdido'].includes(l.etapa)).length;
+  const cer  = leads.filter(l => l.etapa==='Cerrado').length;
   const conv = tot ? Math.round(cer/tot*100) : 0;
 
   document.getElementById('stats-grid').innerHTML = `
     <div class="stat-card" style="--accent:#111111">
       <div class="stat-lbl">Clientes Activos</div>
       <div class="stat-val">${tot}</div>
-      <div class="stat-sub">En tu cartera</div>
+      <div class="stat-sub">En cartera</div>
       <div class="stat-emoji">👥</div>
     </div>
     <div class="stat-card" style="--accent:#b4915c">
@@ -1962,11 +1674,10 @@ function renderDash() {
   updateBadges();
 }
 
-/* ─── ALERTAS (Para llamar hoy / vencidos) ─── */
+/* ─── ALERTS (Para llamar hoy / vencidos) ─── */
 function renderAlerts() {
   const today = new Date().toISOString().split('T')[0];
-  const myLeads = getMyLeads();
-  const alerts = myLeads.filter(l =>
+  const alerts = leads.filter(l =>
     l.proximoContacto &&
     !['Cerrado','Perdido'].includes(l.etapa) &&
     l.proximoContacto <= today
@@ -2011,14 +1722,16 @@ function renderAlerts() {
 
 /* ─── CHARTS ─── */
 function renderCharts() {
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js no está cargado.');
+    return;
+  }
   const destroy = id => { const c=Chart.getChart(id); if(c) c.destroy(); };
 
   const isDark = document.body.classList.contains('dark');
   const txtColor = isDark ? '#a5a5c5' : '#4a4a6a';
   const mutedColor = isDark ? '#7c7c9c' : '#9090aa';
   const gridColor = isDark ? '#26263c' : '#e2e4ed';
-
-  const myLeads = getMyLeads();
 
   // Donut: Stages
   destroy('ch-stages');
@@ -2027,7 +1740,7 @@ function renderCharts() {
     data: {
       labels: STAGES,
       datasets: [{
-        data: STAGES.map(s => myLeads.filter(l=>l.etapa===s).length),
+        data: STAGES.map(s => leads.filter(l=>l.etapa===s).length),
         backgroundColor: STAGES.map(s => STAGE_COLOR[s]+'cc'),
         borderColor: STAGES.map(s => STAGE_COLOR[s]),
         borderWidth: 2, hoverOffset: 6
@@ -2042,7 +1755,7 @@ function renderCharts() {
   });
 
   // Bar: Origins
-  const oCounts = ORIGINS.map(o => myLeads.filter(l=>l.origen===o).length);
+  const oCounts = ORIGINS.map(o => leads.filter(l=>l.origen===o).length);
   const oColors = ['#111111','#b4915c','#10b981','#f59e0b','#f97316','#06b6d4','#8b5cf6'];
   destroy('ch-origins');
   new Chart(document.getElementById('ch-origins'), {
@@ -2064,7 +1777,7 @@ function renderCharts() {
     const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
     const lbl=d.toLocaleString('es',{month:'short'});
     months.push(lbl[0].toUpperCase()+lbl.slice(1));
-    counts.push(myLeads.filter(l=>{ if(!l.creadoEn) return false; const ld=new Date(l.creadoEn); return ld.getMonth()===d.getMonth()&&ld.getFullYear()===d.getFullYear(); }).length);
+    counts.push(leads.filter(l=>{ if(!l.creadoEn) return false; const ld=new Date(l.creadoEn); return ld.getMonth()===d.getMonth()&&ld.getFullYear()===d.getFullYear(); }).length);
   }
   destroy('ch-monthly');
   new Chart(document.getElementById('ch-monthly'), {
@@ -2090,8 +1803,7 @@ function renderCharts() {
 }
 
 function renderRecent() {
-  const myLeads = getMyLeads();
-  const recent = [...myLeads].sort((a,b)=>new Date(b.creadoEn||0)-new Date(a.creadoEn||0)).slice(0,6);
+  const recent = [...leads].sort((a,b)=>new Date(b.creadoEn||0)-new Date(a.creadoEn||0)).slice(0,6);
   document.getElementById('recent-tbl').innerHTML = `
     <table>
       <thead><tr><th>Nombre</th><th>Teléfono</th><th>Barrio</th><th>Presupuesto</th><th>Etapa</th><th>Próx. Contacto</th></tr></thead>
@@ -2111,9 +1823,8 @@ function renderRecent() {
 
 /* ─── KANBAN ─── */
 function renderKanban() {
-  const myLeads = getMyLeads();
   document.getElementById('kanban').innerHTML = STAGES.map(stage => {
-    const cards = myLeads.filter(l=>l.etapa===stage);
+    const cards = leads.filter(l=>l.etapa===stage);
     return `
     <div class="k-col">
       <div class="k-col-hd">
@@ -2153,10 +1864,10 @@ function kCard(l) {
 }
 
 function dStart(e,id) { dragId=id; e.currentTarget.classList.add('dragging'); }
-function dEnd(e) { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.k-cards').forEach(c=>c.classList.remove('dov')); }
+function dEnd(e) { e.currentTarget.classList.remove('dragging'); const cols=document.querySelectorAll('.k-cards'); for(let i=0;i<cols.length;i++) cols[i].classList.remove('dov'); }
 function dOver(e) { e.preventDefault(); e.currentTarget.classList.add('dov'); }
 function dLeave(e) { e.currentTarget.classList.remove('dov'); }
-async function dDrop(e, stage) {
+function dDrop(e, stage) {
   e.preventDefault(); e.currentTarget.classList.remove('dov');
   if (!dragId) return;
   const l = leads.find(x=>x.id===dragId);
@@ -2175,7 +1886,8 @@ async function dDrop(e, stage) {
       hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
     });
 
-    saveLeads();
+    saveLeadToSupabase(l);
+    saveData();
     renderKanban();
     toast(`✅ ${l.nombre} → ${stage}`,'ok');
   }
@@ -2228,35 +1940,11 @@ function renderTable() {
 
   const tbody = document.getElementById('tbl-body');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-st"><div class="esi">🔍</div><h3>Sin resultados</h3><p>No hay clientes con esos filtros.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty-st"><div class="esi">🔍</div><h3>Sin resultados</h3><p>No hay clientes con esos filtros.</p></div></td></tr>`;
     return;
   }
 
-  const isAdmin = currentUser && currentUser.role === 'admin';
-  const headerHtml = `
-    <tr>
-      <th>Nombre</th>
-      <th>Teléfono</th>
-      <th>Localidad / Barrio</th>
-      <th>Presupuesto</th>
-      <th>Amb / Baños</th>
-      <th>Cochera</th>
-      <th>Crédito</th>
-      <th>Financiación</th>
-      <th>Etapa</th>
-      <th>Origen</th>
-      ${isAdmin ? '<th>Asesor</th>' : ''}
-      <th>Próx. Contacto</th>
-      <th>Ingreso</th>
-      <th></th>
-    </tr>
-  `;
-  document.querySelector('#view-clientes thead').innerHTML = headerHtml;
-
-  tbody.innerHTML = rows.map(l => {
-    const ownerObj = appUsers.find(u => u.id === l.owner);
-    const ownerName = ownerObj ? ownerObj.nombre : 'Sin asignar';
-    return `
+  tbody.innerHTML = rows.map(l => `
     <tr>
       <td class="td-name">${l.nombre}</td>
       <td class="td-phone">
@@ -2271,7 +1959,6 @@ function renderTable() {
       <td style="color:var(--text-m);font-size:11.5px">${l.financiacion||'—'}</td>
       <td>${stageBadge(l.etapa)}</td>
       <td style="color:var(--text-m)">${l.origen||'—'}</td>
-      ${isAdmin ? `<td style="font-weight:600;color:var(--secondary)">${ownerName}</td>` : ''}
       <td>${proxBadgeInline(l)}</td>
       <td style="color:var(--text-d);white-space:nowrap">${fmtDate(l.creadoEn)}</td>
       <td>
@@ -2279,83 +1966,9 @@ function renderTable() {
           <button class="btn btn-ghost btn-icon btn-sm" onclick="openModal('${l.id}')" title="Editar">✏️</button>
         </div>
       </td>
-    </tr>`;
-  }).join('');
+    </tr>`).join('');
 
   updateBadges();
-}
-
-/* ─── EMPLEADOS ─── */
-function openEmpModal() {
-  document.getElementById('fe-nombre').value = '';
-  document.getElementById('fe-email').value = '';
-  document.getElementById('fe-pass').value = '';
-  document.getElementById('fe-role').value = 'user';
-  document.getElementById('overlay-emp').classList.add('open');
-}
-
-function closeEmpModal() {
-  document.getElementById('overlay-emp').classList.remove('open');
-}
-
-function onEmpOvClick(e) {
-  if (e.target === document.getElementById('overlay-emp')) closeEmpModal();
-}
-
-function saveEmployee() {
-  const nombre = document.getElementById('fe-nombre').value.trim();
-  const email  = document.getElementById('fe-email').value.trim();
-  const pass   = document.getElementById('fe-pass').value;
-  const role   = document.getElementById('fe-role').value;
-
-  if (!nombre) { toast('⚠️ El nombre es obligatorio', 'err'); return; }
-  if (!email)  { toast('⚠️ El usuario es obligatorio', 'err'); return; }
-  if (pass.length < 4) { toast('⚠️ La contraseña debe tener mínimo 4 caracteres', 'err'); return; }
-
-  const users = getLocalUsers();
-  // Verificar que no exista ya ese usuario
-  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    toast('⚠️ Ya existe un empleado con ese usuario', 'err');
-    return;
-  }
-
-  const empId = 'user_' + Date.now().toString(36);
-  const newEmp = { id: empId, nombre, email, pass, role };
-  users.push(newEmp);
-  saveLocalUsers(users);
-  appUsers = users;
-
-  toast('✅ Empleado registrado con éxito', 'ok');
-  closeEmpModal();
-  refresh();
-}
-
-function renderEmployees() {
-  const tbody = document.getElementById('emp-tbl-body');
-  if (!tbody) return;
-  
-  document.getElementById('emp-count').textContent = `${appUsers.length} empleado${appUsers.length!==1?'s':''} registrado${appUsers.length!==1?'s':''}`;
-  
-  if (!appUsers.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-st"><div class="esi">👥</div><h3>No hay empleados</h3></div></td></tr>`;
-    return;
-  }
-  
-  tbody.innerHTML = appUsers.map(u => {
-    const leadCount = leads.filter(l => l.owner === u.id).length;
-    const roleLabel = u.role === 'admin' ? '👑 Administrador' : '💼 Asesor';
-    const badgeClass = u.role === 'admin' ? 'badge-role admin' : 'badge-role user';
-    
-    return `
-      <tr>
-        <td style="font-weight:700;">${u.nombre}</td>
-        <td style="color:var(--text-m);">${u.email}</td>
-        <td style="color:var(--text-d); font-family:monospace;">${u.pass}</td>
-        <td><span class="${badgeClass}">${roleLabel}</span></td>
-        <td style="font-weight:700; color:var(--primary);">${leadCount} cliente${leadCount!==1?'s':''}</td>
-      </tr>
-    `;
-  }).join('');
 }
 
 function populateFilters() {
@@ -2374,21 +1987,23 @@ function exportCSV() {
     'Nombre','Teléfono','Localidad','Barrio','Operación','Tipo Propiedad',
     'Ambientes','Baños','Cochera','Presupuesto Min','Presupuesto Max','Moneda',
     'Crédito','Financiación','Etapa','Origen','Próximo Contacto','Fecha Ingreso',
-    'Notas','Asesor'
+    'Notas','Cantidad Seguimientos','Último Seguimiento'
   ];
   const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
 
   const csv = [
     headers.map(esc).join(','),
     ...rows.map(l => {
-      const ownerName = getOwnerName(l.owner);
+      const sgt = l.seguimiento || [];
+      const lastSgt = sgt.length ? `${sgt[sgt.length-1].fecha} ${sgt[sgt.length-1].tipo}: ${sgt[sgt.length-1].texto}` : '';
       return [
         l.nombre, l.telefono, l.localidad, l.barrio, l.operacion,
         (l.tipoPropiedad||[]).join('; '),
         l.ambientes, l.banos, l.cochera,
         l.presupuestoMin, l.presupuestoMax, l.moneda,
         l.creditoHipotecario, l.financiacion, l.etapa, l.origen,
-        l.proximoContacto||'', l.creadoEn, l.notes || l.notas, ownerName
+        l.proximoContacto||'', l.creadoEn, l.notes || l.notas || '',
+        sgt.length, lastSgt
       ].map(esc).join(',');
     })
   ].join('\n');
@@ -2396,246 +2011,12 @@ function exportCSV() {
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `propiedades_friedrich_${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `click24_crm_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
   toast(`✅ ${rows.length} clientes exportados`,'ok');
 }
 
-/* ─── PROPERTIES LOGIC ─── */
-function getPropImgUrl(tipo) {
-  const map = {
-    'Departamento': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&auto=format&fit=crop&q=60',
-    'Casa': 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&auto=format&fit=crop&q=60',
-    'PH': 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&auto=format&fit=crop&q=60',
-    'Local': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&auto=format&fit=crop&q=60',
-    'Oficina': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop&q=60',
-    'Terreno': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&auto=format&fit=crop&q=60',
-    'Cochera': 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=400&auto=format&fit=crop&q=60'
-  };
-  return map[tipo] || 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&auto=format&fit=crop&q=60';
-}
-
-function renderProperties() {
-  const op = document.getElementById('f-p-operacion').value;
-  const tp = document.getElementById('f-p-tipo').value;
-  const ord = document.getElementById('f-p-orden').value;
-
-  let list = properties.filter(p => {
-    if (op && p.operacion !== op) return false;
-    if (tp && p.tipo !== tp) return false;
-    if (q && 
-        !matchQuery(p.titulo, q) && 
-        !matchQuery(p.barrio, q) && 
-        !matchQuery(p.operacion, q) && 
-        !matchQuery(p.tipo, q)
-    ) return false;
-    return true;
-  });
-
-  list.sort((a,b) => {
-    if (ord === 'precio_desc') return b.precio - a.precio;
-    if (ord === 'precio_asc') return a.precio - b.precio;
-    if (ord === 'titulo_asc') return a.titulo.localeCompare(b.titulo);
-    return 0;
-  });
-
-  document.getElementById('prop-count').textContent = `${list.length} propiedad${list.length!==1?'es':''} cargada${list.length!==1?'s':''}`;
-
-  const grid = document.getElementById('properties-grid');
-  if (!list.length) {
-    grid.innerHTML = `<div class="empty-st f-full"><div class="esi">🏢</div><h3>No hay propiedades</h3><p>Probá cargando una nueva propiedad o cambiando los filtros.</p></div>`;
-    return;
-  }
-
-  grid.innerHTML = list.map(p => {
-    const isVenta = p.operacion === 'Compra';
-    const tagClass = isVenta ? 'venta' : (p.operacion === 'Alquiler' ? 'alquiler' : 'temporario');
-    const labelOp = isVenta ? 'Venta' : (p.operacion === 'Alquiler' ? 'Alquiler' : 'Temporario');
-    return `
-      <div class="prop-card" onclick="openPropModal('${p.id}')">
-        <div class="prop-img-container">
-          <span class="prop-badge-op ${tagClass}">${labelOp}</span>
-          <img class="prop-img" src="${getPropImgUrl(p.tipo)}" alt="${p.titulo}">
-        </div>
-        <div class="prop-info">
-          <div class="prop-title">${p.titulo}</div>
-          <div class="prop-price">${p.moneda} ${p.precio.toLocaleString()}</div>
-          <div class="prop-meta-row">
-            ${p.ambientes ? `<span class="prop-meta-item">🚪 ${p.ambientes} amb.</span>` : ''}
-            ${p.banos ? `<span class="prop-meta-item">🛁 ${p.banos} bñ</span>` : ''}
-          </div>
-        </div>
-        <div class="prop-footer">
-          <span class="prop-barrio">📍 ${p.barrio}</span>
-          <button class="btn btn-ghost btn-sm" style="padding: 4px 8px;" onclick="openPropModal('${p.id}'); event.stopPropagation();">✏️ Editar</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-  updateBadges();
-}
-
-function openPropModal(id = null) {
-  const waMenu = document.getElementById('wa-menu');
-  if (waMenu) waMenu.style.display = 'none';
-  editPropId = id;
-  delPropPhase = false;
-  document.getElementById('del-prop-confirm').style.display = 'none';
-  document.getElementById('btn-prop-del').style.display = id ? 'inline-flex' : 'none';
-  document.getElementById('btn-prop-del').textContent = '🗑️ Eliminar';
-  document.getElementById('modal-prop-ttl').textContent = id ? 'Editar Propiedad' : 'Nueva Propiedad';
-  document.getElementById('match-prop-section').style.display = id ? 'block' : 'none';
-
-  if (id) {
-    const p = properties.find(x=>x.id===id);
-    if (!p) return;
-    setF('fp-titulo',    p.titulo||'');
-    setF('fp-barrio',    p.barrio||'');
-    setF('fp-precio',    p.precio||'');
-    setF('fp-moneda',    p.moneda||'USD');
-    setF('fp-ambientes', p.ambientes||'');
-    setF('fp-banos',     p.banos||'');
-    setF('fp-cochera',   p.cochera||'No tiene');
-    setF('fp-notas',     p.notas||'');
-    setF('fp-tipo',      p.tipo||'Departamento');
-    syncPillGroup('pg-p-operacion', p.operacion||'Compra', false);
-    renderPropertyMatches(p);
-  } else {
-    ['fp-titulo','fp-barrio','fp-precio','fp-notes','fp-notas'].forEach(fid=>setF(fid,''));
-    setF('fp-moneda','USD'); setF('fp-ambientes',''); setF('fp-banos',''); setF('fp-cochera','No tiene');
-    setF('fp-tipo','Departamento');
-    syncPillGroup('pg-p-operacion','Compra',false);
-  }
-
-  document.getElementById('overlay-prop').classList.add('open');
-  document.getElementById('fp-titulo').focus();
-}
-
-function closePropModal() {
-  document.getElementById('overlay-prop').classList.remove('open');
-  editPropId = null; delPropPhase = false;
-}
-
-function onPropOvClick(e) { if(e.target===document.getElementById('overlay-prop')) closePropModal(); }
-
-function saveProperty() {
-  const titulo = getF('fp-titulo').trim();
-  const barrio = getF('fp-barrio').trim();
-  const precio = parseFloat(getF('fp-precio'))||0;
-
-  if (!titulo) { toast('⚠️ El título es obligatorio','err'); return; }
-  if (!barrio) { toast('⚠️ El barrio es obligatorio','err'); return; }
-  if (!precio) { toast('⚠️ El precio es obligatorio','err'); return; }
-
-  const data = {
-    titulo, barrio, precio,
-    moneda:      getF('fp-moneda'),
-    operacion:   getPillVal('pg-p-operacion'),
-    tipo:        getF('fp-tipo'),
-    ambientes:   getF('fp-ambientes'),
-    banos:       getF('fp-banos'),
-    cochera:     getF('fp-cochera'),
-    notas:       getF('fp-notas').trim()
-  };
-
-  if (editPropId) {
-    const i = properties.findIndex(p=>p.id===editPropId);
-    if (i!==-1) properties[i] = { ...properties[i], ...data };
-    toast('✅ Propiedad actualizada','ok');
-  } else {
-    properties.unshift({ id: 'P-'+Date.now(), ...data });
-    toast('✅ Propiedad agregada','ok');
-  }
-
-  saveProps(); closePropModal(); refresh();
-}
-
-function triggerPropDelete() {
-  if (!delPropPhase) {
-    delPropPhase = true;
-    document.getElementById('del-prop-confirm').style.display = 'block';
-    document.getElementById('btn-prop-del').textContent = '⚠️ Confirmar eliminación';
-    return;
-  }
-  properties = properties.filter(p=>p.id!==editPropId);
-  saveProps(); closePropModal(); refresh();
-  toast('🗑️ Propiedad eliminada','err');
-}
-
-/* ─── CLIENT MATCHMAKING ─── */
-function renderClientMatches(lead) {
-  const list = document.getElementById('match-props-list');
-  if (!list) return;
-  const matches = properties.filter(p => {
-    if (p.operacion !== lead.operacion) return false;
-    if (lead.tipoPropiedad && lead.tipoPropiedad.length && !lead.tipoPropiedad.includes(p.tipo)) return false;
-    if (lead.barrio && p.barrio && !p.barrio.toLowerCase().includes(lead.barrio.toLowerCase()) && !lead.barrio.toLowerCase().includes(p.barrio.toLowerCase())) return false;
-    if (lead.presupuestoMax && p.precio > lead.presupuestoMax) return false;
-    if (lead.presupuestoMin && p.precio < lead.presupuestoMin) return false;
-    return true;
-  });
-
-  if (!matches.length) {
-    list.innerHTML = `<div class="match-empty">🏠 Sin propiedades coincidentes en cartera.</div>`;
-    return;
-  }
-
-  list.innerHTML = matches.map(p => `
-    <div class="match-item">
-      <div class="match-item-info">
-        <div class="match-item-title">${p.titulo}</div>
-        <div class="match-item-meta">📍 ${p.barrio} · ${p.tipo} · ${p.operacion}</div>
-      </div>
-      <div class="match-item-price">${p.moneda} ${p.precio.toLocaleString()}</div>
-      <button class="btn btn-ghost btn-sm" onclick="closeModal(); setView('propiedades'); openPropModal('${p.id}'); event.stopPropagation();" title="Ver propiedad" style="padding: 6px 8px;">👁️</button>
-    </div>
-  `).join('');
-}
-
-/* ─── PROPERTY MATCHMAKING ─── */
-function renderPropertyMatches(prop) {
-  const list = document.getElementById('match-leads-list');
-  const myLeads = getMyLeads();
-  const matches = myLeads.filter(l => {
-    if (l.operacion !== prop.operacion) return false;
-    if (l.tipoPropiedad && l.tipoPropiedad.length && !l.tipoPropiedad.includes(prop.tipo)) return false;
-    if (l.barrio && prop.barrio && !prop.barrio.toLowerCase().includes(l.barrio.toLowerCase()) && !l.barrio.toLowerCase().includes(prop.barrio.toLowerCase())) return false;
-    if (l.presupuestoMax && prop.precio > l.presupuestoMax) return false;
-    if (l.presupuestoMin && prop.precio < l.presupuestoMin) return false;
-    return true;
-  });
-
-  if (!matches.length) {
-    list.innerHTML = `<div class="match-empty">👥 Sin clientes interesados en cartera.</div>`;
-    return;
-  }
-
-  list.innerHTML = matches.map(l => {
-    const ownerName = getOwnerName(l.owner);
-    const waMsg = `Hola ${l.nombre}, ¿cómo estás? Te escribo de Propiedades Friedrich. Quería comentarte que ingresó una propiedad en ${prop.barrio} (${prop.tipo} de ${prop.ambientes} amb.) por ${prop.moneda} ${prop.precio.toLocaleString()} que coincide exactamente con lo que estás buscando. ¿Te interesaría coordinar una visita?`;
-    const cleanPhone = l.telefono.replace(/\D/g, '');
-    let finalPhone = cleanPhone;
-    if (!finalPhone.startsWith('54') && finalPhone.length > 0) {
-      finalPhone = '549' + finalPhone;
-    }
-    const waUrl = `https://wa.me/${finalPhone}?text=${encodeURIComponent(waMsg)}`;
-
-    return `
-      <div class="match-item">
-        <div class="match-item-info">
-          <div class="match-item-title">${l.nombre}</div>
-          <div class="match-item-meta">📞 ${l.telefono} · Presupuesto: ${fmtBudget(l)} · Asesor: ${ownerName}</div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <a href="${waUrl}" target="_blank" class="btn btn-ghost btn-sm" style="color:#25d366;border-color:rgba(37,211,102,.3);padding:6px 8px" onclick="event.stopPropagation();" title="Enviar Propuesta">💬 Ofrecer</a>
-          <button class="btn btn-ghost btn-sm" onclick="closePropModal(); setView('clientes'); openModal('${l.id}'); event.stopPropagation();" title="Ver cliente" style="padding: 6px 8px;">👁️</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-/* ─── MODAL OVERRIDES ─── */
+/* ─── MODAL CONTROLLERS ─── */
 function openModal(id = null) {
   const waMenu = document.getElementById('wa-menu');
   if (waMenu) waMenu.style.display = 'none';
@@ -2645,8 +2026,6 @@ function openModal(id = null) {
   document.getElementById('btn-del').style.display = id ? 'inline-flex' : 'none';
   document.getElementById('btn-del').textContent = '🗑️ Eliminar';
   document.getElementById('modal-ttl').textContent = id ? 'Editar Cliente' : 'Nuevo Cliente';
-  const mSec = document.getElementById('match-client-section');
-  if (mSec) mSec.style.display = id ? 'block' : 'none';
 
   document.getElementById('sgt-section').style.display = id ? 'block' : 'none';
 
@@ -2654,16 +2033,6 @@ function openModal(id = null) {
   sel_e.innerHTML = STAGES.map(s=>`<option value="${s}">${s}</option>`).join('');
   const sel_o = document.getElementById('f-origen');
   sel_o.innerHTML = '<option value="">Seleccionar origen...</option>' + ORIGINS.map(s=>`<option value="${s}">${s}</option>`).join('');
-
-  // Rellenar dropdown de Asesor asignado
-  const sel_owner = document.getElementById('f-owner');
-  if (sel_owner) {
-    sel_owner.innerHTML = appUsers.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
-  }
-  const ownerGrp = document.getElementById('f-owner-group');
-  if (ownerGrp) {
-    ownerGrp.style.display = currentUser.role === 'admin' ? 'block' : 'none';
-  }
 
   if (id) {
     const l = leads.find(x=>x.id===id);
@@ -2684,23 +2053,16 @@ function openModal(id = null) {
     setF('f-fecha',       l.creadoEn||new Date().toISOString().split('T')[0]);
     setF('f-prox-contacto', l.proximoContacto||'');
     
-    // Asignar Asesor actual en el dropdown
-    setF('f-owner',       l.owner||currentUser.id);
-    
     syncPillGroup('pg-operacion',   l.operacion||'Compra', false);
     syncPillGroup('pg-credito',     l.creditoHipotecario||'No', false);
     syncPillGroup('pg-financiacion',l.financiacion||'', false);
     syncPillGroup('pg-tipo',        l.tipoPropiedad||[], true);
     updateProxBadge(l.proximoContacto||'');
     renderSeguimiento(l.seguimiento||[]);
-    renderClientMatches(l);
   } else {
-    ['f-nombre','f-tel','f-localidad','f-barrio','f-pmin','f-pmax','f-notes','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
+    ['f-nombre','f-tel','f-localidad','f-barrio','f-pmin','f-pmax','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
     setF('f-moneda','USD'); setF('f-ambientes',''); setF('f-banos',''); setF('f-cochera','Indistinto');
     setF('f-fecha', new Date().toISOString().split('T')[0]);
-    
-    // Por defecto el asesor responsable es el que crea el cliente
-    setF('f-owner',       currentUser.id);
     
     syncPillGroup('pg-operacion','Compra',false);
     syncPillGroup('pg-credito','No',false);
@@ -2728,8 +2090,6 @@ function saveClient() {
   if (!nombre)   { toast('⚠️ El nombre es obligatorio','err'); return; }
   if (!telefono) { toast('⚠️ El teléfono es obligatorio','err'); return; }
 
-  const ownerVal = currentUser.role === 'admin' ? (document.getElementById('f-owner')?.value || currentUser.id) : currentUser.id;
-
   const data = {
     nombre, telefono,
     localidad:          getF('f-localidad').trim(),
@@ -2748,40 +2108,39 @@ function saveClient() {
     origen:             getF('f-origen'),
     notas:              getF('f-notas').trim(),
     proximoContacto:    getF('f-prox-contacto'),
-    updatedAt:          new Date().toISOString(),
-    owner:              ownerVal
+    updatedAt:          new Date().toISOString()
   };
 
   if (editId) {
-    const oldLead = leads.find(l=>l.id===editId);
-    if (!oldLead) return;
-
-    const oldStage = oldLead.etapa;
-    const newStage = data.etapa;
-    const seguimiento = oldLead.seguimiento ? [...oldLead.seguimiento] : [];
-
-    if (oldStage !== newStage) {
-      const now = new Date();
-      seguimiento.push({
-        id: uid(),
-        tipo: '📝 Nota',
-        texto: `🔄 Etapa actualizada de "${oldStage}" a "${newStage}"`,
-        fecha: now.toISOString().split('T')[0],
-        hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
-      });
-    }
-
-    const updatedLead = { ...oldLead, ...data, seguimiento };
     const idx = leads.findIndex(l=>l.id===editId);
-    if (idx !== -1) leads[idx] = updatedLead;
-    toast('✅ Cliente actualizado','ok');
+    if (idx !== -1) {
+      const oldLead = leads[idx];
+      const oldStage = oldLead.etapa;
+      const newStage = data.etapa;
+      const seguimiento = oldLead.seguimiento ? [...oldLead.seguimiento] : [];
+
+      if (oldStage !== newStage) {
+        const now = new Date();
+        seguimiento.push({
+          id: uid(),
+          tipo: '📝 Nota',
+          texto: `🔄 Etapa actualizada de "${oldStage}" a "${newStage}"`,
+          fecha: now.toISOString().split('T')[0],
+          hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+        });
+      }
+
+      const updatedLead = { ...oldLead, ...data, seguimiento };
+      leads[idx] = updatedLead;
+      saveLeadToSupabase(updatedLead);
+      toast('✅ Cliente actualizado','ok');
+    }
   } else {
     const fechaIngreso = getF('f-fecha') || new Date().toISOString().split('T')[0];
     const now = new Date();
     const newLead = {
       id: uid(),
       creadoEn: fechaIngreso,
-      owner: ownerVal,
       seguimiento: [
         {
           id: uid(),
@@ -2794,10 +2153,11 @@ function saveClient() {
       ...data
     };
     leads.unshift(newLead);
+    saveLeadToSupabase(newLead);
     toast('✅ Cliente agregado','ok');
   }
 
-  saveLeads();
+  saveData();
   closeModal();
   refresh();
 }
@@ -2810,14 +2170,16 @@ function triggerDelete() {
     return;
   }
 
-  leads = leads.filter(l=>l.id!==editId);
-  saveLeads();
+  const idToDelete = editId;
+  leads = leads.filter(l=>l.id!==idToDelete);
+  deleteLeadFromSupabase(idToDelete);
+  saveData();
   closeModal();
   refresh();
   toast('🗑️ Cliente eliminado','err');
 }
 
-/* ─── SEGUIMIENTO ─── */
+/* ─── FOLLOW-UP RECORDS ─── */
 function renderSeguimiento(entries) {
   const tl = document.getElementById('sgt-timeline');
   if (!entries.length) {
@@ -2849,7 +2211,7 @@ function renderSeguimiento(entries) {
   }).join('');
 }
 
-async function addSeguimiento() {
+function addSeguimiento() {
   if (!editId) return;
   const tipo  = document.getElementById('sgt-tipo').value;
   const texto = document.getElementById('sgt-texto').value.trim();
@@ -2868,20 +2230,22 @@ async function addSeguimiento() {
     hora:  now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
   };
 
-  lead.seguimiento = [...lead.seguimiento, newEntry];
-  saveLeads();
+  lead.seguimiento.push(newEntry);
+  saveLeadToSupabase(lead);
+  saveData();
   renderSeguimiento(lead.seguimiento);
   document.getElementById('sgt-texto').value = '';
   toast(`✅ ${tipo} registrado`,'ok');
 }
 
-async function deleteSeguimiento(entryId) {
+function deleteSeguimiento(entryId) {
   if (!editId) return;
   const lead = leads.find(l => l.id === editId);
   if (!lead || !lead.seguimiento) return;
 
   lead.seguimiento = lead.seguimiento.filter(e => e.id !== entryId);
-  saveLeads();
+  saveLeadToSupabase(lead);
+  saveData();
   renderSeguimiento(lead.seguimiento);
   toast('🗑️ Registro eliminado','err');
 }
@@ -2907,6 +2271,7 @@ function pickPill(groupId, val, multi, el) {
   }
 }
 
+// Se eliminó la validación redundante del elemento pill en getPillVal
 function getPillVal(groupId) {
   const el = document.querySelector(`#${groupId} .pill.on`);
   return el ? el.dataset.val : '';
@@ -2949,6 +2314,7 @@ function stageBadge(e) {
   return `<span class="badge" style="background:${c}22;color:${c}">${e||'—'}</span>`;
 }
 
+// Se simplificó la asignación de color en creditBadge
 function creditBadge(v) {
   const m = {'Sí':'#10b981','No':'#ef4444','En trámite':'#f59e0b'};
   const c = m[v]||'#55557a';
@@ -2966,16 +2332,18 @@ function proxBadgeInline(l) {
 }
 
 function updateBadges() {
-  const myLeads = getMyLeads();
-  const act = myLeads.filter(l=>!['Cerrado','Perdido'].includes(l.etapa)).length;
-  document.getElementById('bdg-pipeline').textContent = act;
-  document.getElementById('bdg-clientes').textContent = myLeads.length;
+  const act = leads.filter(l=>!['Cerrado','Perdido'].includes(l.etapa)).length;
+  const pBdg = document.getElementById('bdg-pipeline');
+  const cBdg = document.getElementById('bdg-clientes');
+  if (pBdg) pBdg.textContent = act;
+  if (cBdg) cBdg.textContent = leads.length;
 }
 
 /* ─── TOAST ─── */
 let _tt;
 function toast(msg, type='ok') {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg; t.className = `toast ${type}`; t.style.display='flex';
   clearTimeout(_tt); _tt = setTimeout(()=>t.style.display='none', 3000);
 }
@@ -2986,37 +2354,20 @@ function refresh() {
   if (view==='dashboard') renderDash();
   if (view==='pipeline')  renderKanban();
   if (view==='clientes')  renderTable();
-  if (view==='empleados') renderEmployees();
-  if (view==='propiedades') renderProperties();
 }
 
 /* ─── KEYBOARD ─── */
 document.addEventListener('keydown', e => {
-  if (e.key==='Escape') { 
-    closeModal(); 
-    if (typeof closePropModal === 'function') closePropModal(); 
-  }
-  const overlay = document.getElementById('overlay');
-  const overlayProp = document.getElementById('overlay-prop');
-  const isOverlayOpen = overlay && overlay.classList.contains('open');
-  const isOverlayPropOpen = overlayProp && overlayProp.classList.contains('open');
-  
-  if (e.key==='n' && !isOverlayOpen && !isOverlayPropOpen && document.activeElement.tagName!=='INPUT' && currentUser) {
-    if (view === 'propiedades' && typeof openPropModal === 'function') openPropModal();
-    else openModal();
-  }
+  if (e.key==='Escape') closeModal();
+  if (e.key==='n' && !document.getElementById('overlay').classList.contains('open') && document.activeElement.tagName!=='INPUT') openModal();
 });
 
 /* ─── THEME TOGGLE ─── */
 function initTheme() {
   const theme = localStorage.getItem('click24_theme') || 'light';
-  if (theme === 'dark') {
-    document.body.classList.add('dark');
-    updateThemeUI(true);
-  } else {
-    document.body.classList.remove('dark');
-    updateThemeUI(false);
-  }
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark', isDark);
+  updateThemeUI(isDark);
 }
 function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
@@ -3039,6 +2390,7 @@ function showWaTemplates(e) {
   e.stopPropagation();
   const btn = e.currentTarget;
   const menu = document.getElementById('wa-menu');
+  if (!menu) return;
   if (menu.style.display === 'block') {
     menu.style.display = 'none';
     return;
@@ -3065,7 +2417,7 @@ function showWaTemplates(e) {
   setTimeout(() => document.addEventListener('click', close), 10);
 }
 
-async function sendWaTemplate(templateId) {
+function sendWaTemplate(templateId) {
   const tel = document.getElementById('f-tel').value.trim();
   const nombre = document.getElementById('f-nombre').value.trim();
   const barrio = document.getElementById('f-barrio').value.trim();
@@ -3087,7 +2439,7 @@ async function sendWaTemplate(templateId) {
   } else if (templateId === 3) {
     msg = `Hola ${nombre}, ¿cómo estás? Quería consultarte si te queda bien coordinar una visita para conocer las propiedades que vimos. ¿Te vendría bien esta semana?`;
   } else if (templateId === 4) {
-    msg = `Hola ${nombre}, te escribo de Click24...`;
+    msg = `Hola ${nombre}, te escribo de Propiedades Friedrich...`;
   }
   
   const cleanPhone = tel.replace(/\D/g, '');
@@ -3111,8 +2463,9 @@ async function sendWaTemplate(templateId) {
         fecha: now.toISOString().split('T')[0],
         hora: now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
       };
-      lead.seguimiento = [...lead.seguimiento, newEntry];
-      saveLeads();
+      lead.seguimiento.push(newEntry);
+      saveLeadToSupabase(lead);
+      saveData();
       renderSeguimiento(lead.seguimiento);
     }
   }
@@ -3134,11 +2487,6 @@ function toggleSidebar(open) {
 
 /* ─── INIT ─── */
 initTheme();
-// Auto-login directo como Administrador
-currentUser = getLocalUsers()[0];
-appUsers = getLocalUsers();
-document.getElementById('login-overlay').style.display = 'none';
-updateUserSidebarUI();
 loadData();
 </script>
 </body>
