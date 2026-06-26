@@ -1248,6 +1248,7 @@ function leadToRow(l) {
     operacion: l.operacion || '',
     tipopropiedad: l.tipoPropiedad || [],
     ambientes: l.ambientes || '',
+    banos: l.banos || '',
     cochera: l.cochera || '',
     presupuestomin: parseFloat(l.presupuestoMin) || 0,
     presupuestomax: parseFloat(l.presupuestoMax) || 0,
@@ -1276,7 +1277,7 @@ function rowToLead(r) {
     operacion: r.operacion || '',
     tipoPropiedad: r.tipopropiedad || [],
     ambientes: r.ambientes || '',
-    banos: '', // no está en base de datos
+    banos: r.banos || '',
     cochera: r.cochera || '',
     presupuestoMin: r.presupuestomin || 0,
     presupuestoMax: r.presupuestomax || 0,
