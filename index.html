@@ -1257,7 +1257,7 @@ const KEY = 'friedrich_leads_v2';
 /* ─── SUPABASE INTEGRATION ─── */
 const supabaseUrl = 'https://piuhuwkkgdfzyukhngli.supabase.co';
 const supabaseKey = 'sb_publishable_OriN8olSNsIPo6lysdUCnQ_j_SoMT0d';
-const supabase = (window.supabase && typeof window.supabase.createClient === 'function') ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function') ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
 // Conversión de Lead JS a Fila Supabase (columnas en minúscula)
 function leadToRow(l) {
@@ -1467,9 +1467,9 @@ async function loadData() {
   updateDbStatus('connecting');
 
   // 2. CONEXIÓN ASÍNCRONA CON SUPABASE
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('leads')
         .select('*');
         
@@ -1517,10 +1517,10 @@ function saveData() {
 }
 
 async function saveLeadToSupabase(l, silent = false) {
-  if (!supabase) return;
+  if (!supabaseClient) return;
   try {
     const row = leadToRow(l);
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('leads')
       .upsert(row);
       
@@ -1534,9 +1534,9 @@ async function saveLeadToSupabase(l, silent = false) {
 }
 
 async function deleteLeadFromSupabase(id) {
-  if (!supabase) return;
+  if (!supabaseClient) return;
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('leads')
       .delete()
       .eq('id', id);
@@ -1549,9 +1549,9 @@ async function deleteLeadFromSupabase(id) {
 }
 
 function initRealtime() {
-  if (!supabase) return;
+  if (!supabaseClient) return;
   
-  supabase
+  supabaseClient
     .channel('leads-realtime')
     .on(
       'postgres_changes',
