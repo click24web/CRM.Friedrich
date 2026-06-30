@@ -546,6 +546,72 @@
       color: var(--secondary);
     }
 
+    /* Estilos para etiquetas (tags) de barrio */
+    .tags-input-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 6px 10px;
+      min-height: 38px;
+      transition: border-color var(--t), box-shadow var(--t);
+      cursor: text;
+    }
+    .tags-input-container:focus-within {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px var(--primary-g);
+    }
+    .tags-input-container input {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      flex: 1;
+      min-width: 80px;
+      padding: 2px 0;
+    }
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(124, 58, 237, 0.12);
+      color: var(--secondary);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      transition: all var(--t);
+      user-select: none;
+    }
+    body.dark .tag-badge {
+      background: rgba(139, 92, 246, 0.16);
+      color: #a78bfa;
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+    .tag-badge .tag-close {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--text-d);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      transition: background var(--t), color var(--t);
+    }
+    .tag-badge .tag-close:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
     /* ── FORM ── */
     .f-section { margin-bottom: 22px; }
     .f-section-title {
@@ -1457,13 +1523,31 @@
               </button>
             </div>
           </div>
-          <div class="f-group">
-            <label>Localidad</label>
-            <input type="text" id="f-localidad" placeholder="Ej: CABA, GBA Norte...">
+          <div class="f-group f-full" style="display: flex; flex-direction: column; gap: 8px;">
+            <label>📍 Localidad de Búsqueda</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="f-group">
+                <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 1: Zona</label>
+                <div class="pill-group" id="pg-localidad-zona">
+                  <div class="pill" data-val="Capital Federal" onclick="selectLocalidadZona('Capital Federal')">Capital Federal</div>
+                  <div class="pill" data-val="Gran Buenos Aires" onclick="selectLocalidadZona('Gran Buenos Aires')">Gran Buenos Aires</div>
+                  <div class="pill" data-val="Interior Provincia" onclick="selectLocalidadZona('Interior Provincia')">Interior Provincia</div>
+                </div>
+              </div>
+              <div class="f-group">
+                <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 2: Lugar Específico</label>
+                <select id="f-localidad" disabled>
+                  <option value="">Seleccione una zona primero...</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div class="f-group">
-            <label>Barrio de Interés</label>
-            <input type="text" id="f-barrio" placeholder="Ej: Palermo, Belgrano...">
+          <div class="f-group f-full">
+            <label>🏘️ Barrio de Interés (Etiquetas múltiples)</label>
+            <div class="tags-input-container" onclick="document.getElementById('f-barrio-input').focus()">
+              <div id="barrios-tags-list" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;"></div>
+              <input type="text" id="f-barrio-input" placeholder="Ej: Palermo, Belgrano..." onkeydown="handleBarrioInputKey(event)">
+            </div>
           </div>
         </div>
       </div>
@@ -1475,10 +1559,10 @@
           <div class="f-group f-full">
             <label>Tipo de Operación</label>
             <div class="pill-group" id="pg-operacion">
-              <div class="pill on" data-val="Compra" onclick="pickPill('pg-operacion','Compra',false,this); document.getElementById('f-group-temp-months').style.display = 'none';">🛒 Compra</div>
-              <div class="pill" data-val="Alquiler anual" onclick="pickPill('pg-operacion','Alquiler anual',false,this); document.getElementById('f-group-temp-months').style.display = 'none';">🔑 Alquiler anual</div>
-              <div class="pill" data-val="Alquiler comercial" onclick="pickPill('pg-operacion','Alquiler comercial',false,this); document.getElementById('f-group-temp-months').style.display = 'none';">💼 Alquiler comercial</div>
-              <div class="pill" data-val="Alquiler temporario" onclick="pickPill('pg-operacion','Alquiler temporario',false,this); document.getElementById('f-group-temp-months').style.display = 'block';">⏱️ Alquiler temporario</div>
+              <div class="pill on" data-val="Compra" onclick="pickPill('pg-operacion','Compra',false,this); document.getElementById('f-group-temp-months').style.display = 'none'; updateFinanciacion('Compra');">🛒 Compra</div>
+              <div class="pill" data-val="Alquiler anual" onclick="pickPill('pg-operacion','Alquiler anual',false,this); document.getElementById('f-group-temp-months').style.display = 'none'; updateFinanciacion('Alquiler anual');">🔑 Alquiler anual</div>
+              <div class="pill" data-val="Alquiler comercial" onclick="pickPill('pg-operacion','Alquiler comercial',false,this); document.getElementById('f-group-temp-months').style.display = 'none'; updateFinanciacion('Alquiler comercial');">💼 Alquiler comercial</div>
+              <div class="pill" data-val="Alquiler temporario" onclick="pickPill('pg-operacion','Alquiler temporario',false,this); document.getElementById('f-group-temp-months').style.display = 'block'; updateFinanciacion('Alquiler temporario');">⏱️ Alquiler temporario</div>
             </div>
             <div id="f-group-temp-months" style="display:none; margin-top: 8px;">
               <label>Duración (meses):</label>
@@ -1579,6 +1663,7 @@
               <div class="pill" data-val="Sí" onclick="pickPill('pg-credito','Sí',false,this)">✅ Sí</div>
               <div class="pill on" data-val="No" onclick="pickPill('pg-credito','No',false,this)">❌ No</div>
               <div class="pill" data-val="En trámite" onclick="pickPill('pg-credito','En trámite',false,this)">⏳ En trámite</div>
+              <div class="pill" data-val="No aplica" onclick="pickPill('pg-credito','No aplica',false,this)">🚫 No aplica</div>
             </div>
           </div>
           <div class="f-group">
@@ -1646,6 +1731,18 @@
           <button class="btn btn-primary btn-sm" onclick="addSeguimiento()">＋ Agregar</button>
         </div>
         <div class="sgt-timeline" id="sgt-timeline"></div>
+      </div>
+
+      <!-- Advertencia de Duplicado de Teléfono -->
+      <div id="phone-dup-warning" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--r-sm); padding: 14px; margin-top: 14px; color: var(--warning); font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: 600;">
+          <span style="font-size: 16px;">⚠️</span>
+          <span>Ya existe un cliente con ese teléfono: <span id="phone-dup-info" style="font-weight: 700;"></span></span>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn btn-ghost btn-sm" onclick="hidePhoneWarning()">Cancelar</button>
+          <button class="btn btn-primary btn-sm" style="background: var(--warning); border-color: var(--warning); box-shadow: none;" onclick="saveClient(true)">Guardar igual</button>
+        </div>
       </div>
     </div>
 
@@ -1857,7 +1954,7 @@ function leadToRow(l) {
     telefono: l.telefono || '',
     owner: l.owner || 'admin',
     localidad: l.localidad || '',
-    barrio: l.barrio || '',
+    barrio: l.barrio || [],
     operacion: l.operacion || '',
     tipopropiedad: l.tipoPropiedad || [],
     ambientes: l.ambientes || '',
@@ -1885,7 +1982,7 @@ function rowToLead(r) {
     telefono: r.telefono,
     owner: r.owner || 'admin',
     localidad: r.localidad || '',
-    barrio: r.barrio || '',
+    barrio: Array.isArray(r.barrio) ? r.barrio : (typeof r.barrio === 'string' ? r.barrio.split(',').map(s => s.trim()).filter(Boolean) : []),
     operacion: r.operacion || '',
     tipoPropiedad: r.tipopropiedad || [],
     ambientes: r.ambientes || '',
@@ -1937,6 +2034,37 @@ let editId   = null;
 let q        = '';
 let delPhase = false;
 let dragId   = null;
+let selectedBarrios = [];
+
+const LOCALIDADES_DATA = {
+  "Capital Federal": [
+    "Agronomía", "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo", "Caballito", "Chacarita",
+    "Coghlan", "Colegiales", "Constitución", "Flores", "Floresta", "La Boca", "La Paternal",
+    "Liniers", "Mataderos", "Monte Castro", "Monserrat", "Nueva Pompeya", "Núñez", "Palermo",
+    "Parque Avellaneda", "Parque Chacabuco", "Parque Chas", "Parque Patricios", "Puerto Madero",
+    "Recoleta", "Retiro", "Saavedra", "San Cristóbal", "San Nicolás", "San Telmo", "Vélez Sarsfield",
+    "Versalles", "Villa Crespo", "Villa del Parque", "Villa Devoto", "Villa General Mitre",
+    "Villa Lugano", "Villa Luro", "Villa Ortúzar", "Villa Pueyrredón", "Villa Real", "Villa Riachuelo",
+    "Villa Santa Rita", "Villa Soldati", "Villa Urquiza"
+  ],
+  "Gran Buenos Aires": [
+    "GBA Norte", "GBA Sur", "GBA Oeste",
+    "San Isidro", "Tigre", "Vicente López", "San Fernando", "Pilar", "Escobar",
+    "Avellaneda", "Lanús", "Lomas de Zamora", "Quilmes", "Almirante Brown", "Esteban Echeverría", "Ezeiza", "Berazategui",
+    "Morón", "La Matanza", "Tres de Febrero", "San Martín", "Ituzaingó", "Hurlingham", "Merlo", "Moreno", "San Miguel"
+  ],
+  "Interior Provincia": [
+    "La Plata", "Mar del Plata", "Bahía Blanca", "Tandil", "Necochea", "Pinamar", "Villa Gesell", "San Nicolás de los Arroyos",
+    "Chivilcoy", "Pergamino", "Junín", "Olavarría", "Azul", "Campana", "Zárate", "Luján", "Mercedes"
+  ]
+};
+
+function getZonaByLocalidad(locValue) {
+  for (const [zona, list] of Object.entries(LOCALIDADES_DATA)) {
+    if (list.includes(locValue)) return zona;
+  }
+  return '';
+}
 
 /* ─── SEED DATA ─── */
 function seed() {
@@ -2231,7 +2359,7 @@ function showSearchSuggestions(val) {
     container.innerHTML = matches.map((l, index) => `
       <div class="suggestion-item" data-index="${index}" onclick="selectSuggestion('${l.id}')">
         <div class="suggestion-title">${l.nombre}</div>
-        <div class="suggestion-subtitle">📞 ${l.telefono} · 📍 ${[l.localidad, l.barrio].filter(Boolean).join(' › ') || '—'} · Etapa: ${l.etapa}</div>
+        <div class="suggestion-subtitle">📞 ${l.telefono} · 📍 ${[l.localidad, Array.isArray(l.barrio) ? l.barrio.join(' · ') : l.barrio].filter(Boolean).join(' › ') || '—'} · Etapa: ${l.etapa}</div>
       </div>
     `).join('');
   }
@@ -2579,7 +2707,7 @@ function renderRecent() {
         <tr style="cursor:pointer" onclick="openModal('${l.id}')">
           <td class="td-name">${l.nombre}</td>
           <td class="td-phone"><a href="tel:${l.telefono}" onclick="event.stopPropagation()">${l.telefono}</a></td>
-          <td>${[l.localidad,l.barrio].filter(Boolean).join(' › ')||'—'}</td>
+          <td>${[l.localidad, Array.isArray(l.barrio) ? l.barrio.join(' · ') : l.barrio].filter(Boolean).join(' › ')||'—'}</td>
           <td style="font-weight:700;color:#10b981">${fmtBudget(l)||'—'}</td>
           <td>${stageBadge(l.etapa)}</td>
           <td>${proxBadgeInline(l)}</td>
@@ -2621,7 +2749,7 @@ function kCard(l) {
     ${alertIco ? `<span class="k-card-alert">${alertIco}</span>` : ''}
     <div class="k-card-name">${l.nombre}</div>
     <div class="k-card-row">📞 ${l.telefono}</div>
-    ${l.localidad||l.barrio ? `<div class="k-card-row">📍 ${[l.localidad,l.barrio].filter(Boolean).join(' › ')}</div>` : ''}
+    ${l.localidad||(Array.isArray(l.barrio)?l.barrio.length:l.barrio) ? `<div class="k-card-row">📍 ${[l.localidad, Array.isArray(l.barrio) ? l.barrio.join(' · ') : l.barrio].filter(Boolean).join(' › ')}</div>` : ''}
     ${l.operacion ? `<div class="k-card-row">🏠 ${l.operacion}${l.tipoPropiedad?.length?' · '+l.tipoPropiedad[0]:''}</div>` : ''}
     ${fmtBudget(l) ? `<div class="k-card-budget">${fmtBudget(l)}</div>` : ''}
     <div class="k-card-ft">
@@ -2722,7 +2850,7 @@ function renderTable() {
         <a href="tel:${l.telefono}" onclick="event.stopPropagation()">${l.telefono}</a>
         <span onclick="event.stopPropagation(); triggerQuickContact('${l.id}', '💬 WhatsApp')" title="WhatsApp rápido" style="margin-left:8px;color:#25d366;cursor:pointer;font-size:13px;display:inline-block;">💬</span>
       </td>
-      <td>${[l.localidad,l.barrio].filter(Boolean).join(' › ')||'—'}</td>
+      <td>${[l.localidad, Array.isArray(l.barrio) ? l.barrio.join(' · ') : l.barrio].filter(Boolean).join(' › ')||'—'}</td>
       <td style="font-weight:700;color:#10b981;white-space:nowrap">${fmtBudget(l)||'—'}</td>
       <td style="color:var(--text-m);white-space:nowrap">${l.ambientes?l.ambientes+' amb.':'—'}${l.banos?' / '+l.banos+' bñ':''}</td>
       <td style="color:var(--text-m)">${l.cochera||'—'}</td>
@@ -2769,7 +2897,7 @@ function exportCSV() {
       const sgt = l.seguimiento || [];
       const lastSgt = sgt.length ? `${sgt[sgt.length-1].fecha} ${sgt[sgt.length-1].tipo}: ${sgt[sgt.length-1].texto}` : '';
       return [
-        l.nombre, l.telefono, l.localidad, l.barrio, l.operacion,
+        l.nombre, l.telefono, l.localidad, Array.isArray(l.barrio) ? l.barrio.join(', ') : l.barrio, l.operacion,
         (l.tipoPropiedad||[]).join(', '),
         l.ambientes, l.banos, l.cochera,
         l.presupuestoMin, l.presupuestoMax, l.moneda,
@@ -2811,8 +2939,35 @@ function openModal(id = null) {
     if (!l) return;
     setF('f-nombre',      l.nombre||'');
     setF('f-tel',         l.telefono||'');
-    setF('f-localidad',   l.localidad||'');
-    setF('f-barrio',      l.barrio||'');
+    
+    // Cargar Localidad (Selector de dos pasos)
+    const locVal = l.localidad || '';
+    const zona = getZonaByLocalidad(locVal);
+    if (zona) {
+      syncPillGroup('pg-localidad-zona', zona, false);
+      populateLocalidades(zona);
+      setF('f-localidad', locVal);
+    } else {
+      syncPillGroup('pg-localidad-zona', '', false);
+      const locSelect = document.getElementById('f-localidad');
+      if (locSelect) {
+        locSelect.innerHTML = '<option value="">Seleccione una zona primero...</option>';
+        locSelect.disabled = true;
+      }
+    }
+    
+    // Cargar Barrio (Etiquetas múltiples)
+    let barrios = [];
+    if (l.barrio) {
+      if (Array.isArray(l.barrio)) {
+        barrios = [...l.barrio];
+      } else if (typeof l.barrio === 'string') {
+        barrios = l.barrio.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    }
+    selectedBarrios = barrios;
+    renderBarriosTags();
+
     setF('f-pmin',        l.presupuestoMin||'');
     setF('f-pmax',        l.presupuestoMax||'');
     setF('f-moneda',      l.moneda||'USD');
@@ -2846,12 +3001,25 @@ function openModal(id = null) {
     
     syncPillGroup('pg-operacion',   operacionVal, false);
     syncPillGroup('pg-credito',     l.creditoHipotecario||'No', false);
-    syncPillGroup('pg-financiacion',l.financiacion||'', false);
+    updateFinanciacion(operacionVal, l.financiacion||'');
     syncPillGroup('pg-tipo',        l.tipoPropiedad||[], true);
     updateProxBadge(l.proximoContacto||'');
     renderSeguimiento(l.seguimiento||[]);
   } else {
-    ['f-nombre','f-tel','f-localidad','f-barrio','f-pmin','f-pmax','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
+    ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
+    
+    // Reset Localidad
+    syncPillGroup('pg-localidad-zona', '', false);
+    const locSelect = document.getElementById('f-localidad');
+    if (locSelect) {
+      locSelect.innerHTML = '<option value="">Seleccione una zona primero...</option>';
+      locSelect.disabled = true;
+    }
+    
+    // Reset Barrio
+    selectedBarrios = [];
+    renderBarriosTags();
+
     setF('f-moneda','USD'); setF('f-ambientes',''); setF('f-banos',''); setF('f-cochera','Indiferente');
     setF('f-fecha', new Date().toISOString().split('T')[0]);
     
@@ -2859,8 +3027,8 @@ function openModal(id = null) {
     setF('f-temp-meses', '');
     
     syncPillGroup('pg-operacion','Compra',false);
+    updateFinanciacion('Compra', '');
     syncPillGroup('pg-credito','No',false);
-    syncPillGroup('pg-financiacion','',false);
     syncPillGroup('pg-tipo',[],true);
     document.getElementById('prox-badge').style.display = 'none';
   }
@@ -2874,11 +3042,12 @@ function closeModal() {
   if (waMenu) waMenu.style.display = 'none';
   document.getElementById('overlay').classList.remove('open');
   editId = null; delPhase = false;
+  hidePhoneWarning();
 }
 
 function onOvClick(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
 
-function saveClient() {
+function saveClient(force = false) {
   const nombre   = getF('f-nombre').trim();
   const telefono = getF('f-tel').trim();
   if (!nombre)   { toast('⚠️ El nombre es obligatorio','err'); return; }
@@ -2886,10 +3055,17 @@ function saveClient() {
 
   // Validar duplicado de teléfono (solo comparando dígitos)
   const cleanNewPhone = telefono.replace(/\D/g, '');
-  if (cleanNewPhone) {
-    const isDuplicate = leads.some(l => l.telefono.replace(/\D/g, '') === cleanNewPhone && l.id !== editId);
-    if (isDuplicate) {
-      toast('⚠️ Ya existe un cliente con ese número de teléfono', 'err');
+  if (cleanNewPhone && !force) {
+    const duplicate = leads.find(l => l.telefono.replace(/\D/g, '') === cleanNewPhone && l.id !== editId);
+    if (duplicate) {
+      const dupInfo = `${duplicate.nombre} (${duplicate.etapa || 'Sin etapa'})`;
+      const dupInfoSpan = document.getElementById('phone-dup-info');
+      if (dupInfoSpan) dupInfoSpan.textContent = dupInfo;
+      const warningDiv = document.getElementById('phone-dup-warning');
+      if (warningDiv) {
+        warningDiv.style.display = 'block';
+        warningDiv.scrollIntoView({ behavior: 'smooth' });
+      }
       return;
     }
   }
@@ -2905,7 +3081,7 @@ function saveClient() {
   const data = {
     nombre, telefono,
     localidad:          getF('f-localidad').trim(),
-    barrio:             getF('f-barrio').trim(),
+    barrio:             selectedBarrios,
     presupuestoMin:     parseFloat(getF('f-pmin'))||0,
     presupuestoMax:     parseFloat(getF('f-pmax'))||0,
     moneda:             getF('f-moneda'),
@@ -3071,6 +3247,131 @@ function updateProxBadge(dateStr) {
   if      (dateStr < today)  { badge.className='prox-badge overdue'; badge.textContent='⚠️ Vencido'; }
   else if (dateStr === today) { badge.className='prox-badge today';   badge.textContent='🟡 Hoy'; }
   else                        { badge.className='prox-badge future';  badge.textContent='✅ Próximo'; }
+}
+
+/* ─── LOCALIDAD SELECTOR HELPERS ─── */
+function selectLocalidadZona(zona) {
+  const container = document.getElementById('pg-localidad-zona');
+  if (!container) return;
+  container.querySelectorAll('.pill').forEach(p => {
+    if (p.getAttribute('data-val') === zona) {
+      p.classList.add('on');
+    } else {
+      p.classList.remove('on');
+    }
+  });
+  populateLocalidades(zona);
+}
+
+function populateLocalidades(zona) {
+  const locSelect = document.getElementById('f-localidad');
+  if (!locSelect) return;
+  locSelect.disabled = false;
+  
+  let optionsHtml = '<option value="">Seleccionar lugar...</option>';
+  if (LOCALIDADES_DATA[zona]) {
+    LOCALIDADES_DATA[zona].forEach(loc => {
+      optionsHtml += `<option value="${loc}">${loc}</option>`;
+    });
+  }
+  locSelect.innerHTML = optionsHtml;
+}
+
+/* ─── BARRIOS TAGS HELPERS ─── */
+function handleBarrioInputKey(e) {
+  const input = e.target;
+  const val = input.value.trim();
+
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    let cleaned = val.replace(/,$/, '').trim();
+    if (cleaned && !selectedBarrios.includes(cleaned)) {
+      selectedBarrios.push(cleaned);
+      renderBarriosTags();
+    }
+    input.value = '';
+  } else if (e.key === 'Backspace' && val === '' && selectedBarrios.length > 0) {
+    selectedBarrios.pop();
+    renderBarriosTags();
+  }
+}
+
+function renderBarriosTags() {
+  const container = document.getElementById('barrios-tags-list');
+  const input = document.getElementById('f-barrio-input');
+  if (!container || !input) return;
+  
+  if (selectedBarrios.length > 0) {
+    input.placeholder = '';
+  } else {
+    input.placeholder = 'Ej: Palermo, Belgrano...';
+  }
+
+  container.innerHTML = selectedBarrios.map((b, idx) => `
+    <span class="tag-badge">
+      ${b}
+      <span class="tag-close" onclick="removeBarrioTag(${idx}); event.stopPropagation();">✕</span>
+    </span>
+  `).join('');
+}
+
+function removeBarrioTag(idx) {
+  selectedBarrios.splice(idx, 1);
+  renderBarriosTags();
+}
+
+/* ─── DYNAMIC FINANCIACION ─── */
+function updateFinanciacion(operacion, selectedVal = null) {
+  const container = document.getElementById('pg-financiacion');
+  if (!container) return;
+
+  const isCompra = (operacion === 'Compra');
+  
+  // Actualizar pg-credito si es Alquiler
+  if (!isCompra) {
+    syncPillGroup('pg-credito', 'No aplica', false);
+  } else {
+    const currentCredito = getPillVal('pg-credito');
+    if (currentCredito === 'No aplica') {
+      syncPillGroup('pg-credito', 'No', false);
+    }
+  }
+
+  let html = '';
+  if (isCompra) {
+    const options = [
+      { val: 'Anticipo y saldo financiado', label: '📑 Anticipo y saldo financiado' },
+      { val: 'Contado', label: '💵 Contado' },
+      { val: 'En pozo', label: '🏗️ En pozo' },
+      { val: 'Financiación particular', label: '🤝 Financiación particular' },
+      { val: 'Sin definir', label: '❓ Sin definir' }
+    ];
+    html = options.map(opt => `
+      <div class="pill" data-val="${opt.val}" onclick="pickPill('pg-financiacion','${opt.val}',false,this)">${opt.label}</div>
+    `).join('');
+  } else {
+    const options = [
+      { val: 'Pago mensual', label: '📅 Pago mensual' },
+      { val: 'Pago semestral', label: '📆 Pago semestral' },
+      { val: 'Pago anual', label: '🔑 Pago anual' }
+    ];
+    html = options.map(opt => `
+      <div class="pill" data-val="${opt.val}" onclick="pickPill('pg-financiacion','${opt.val}',false,this)">${opt.label}</div>
+    `).join('');
+  }
+
+  container.innerHTML = html;
+
+  if (selectedVal) {
+    syncPillGroup('pg-financiacion', selectedVal, false);
+  } else {
+    syncPillGroup('pg-financiacion', '', false);
+  }
+}
+
+function hidePhoneWarning() {
+  const warningDiv = document.getElementById('phone-dup-warning');
+  if (warningDiv) warningDiv.style.display = 'none';
 }
 
 /* ─── PILL HELPERS ─── */
@@ -3271,7 +3572,7 @@ function showWaTemplates(e) {
 function sendWaTemplate(templateId) {
   const tel = document.getElementById('f-tel').value.trim();
   const nombre = document.getElementById('f-nombre').value.trim();
-  const barrio = document.getElementById('f-barrio').value.trim();
+  const barrio = (selectedBarrios || []).join(' · ');
   const operacion = getPillVal('pg-operacion') || 'búsqueda';
   const tipoArray = getPillVals('pg-tipo');
   const tipoStr = tipoArray.length ? tipoArray.join('/') : 'propiedades';
@@ -4001,7 +4302,7 @@ const _origSendWa = sendWaTemplate;
 sendWaTemplate = function(templateId) {
   const tel = document.getElementById('f-tel').value.trim();
   const nombre = document.getElementById('f-nombre').value.trim();
-  const barrio = document.getElementById('f-barrio').value.trim();
+  const barrio = (selectedBarrios || []).join(' · ');
   const operacion = getPillVal('pg-operacion') || 'búsqueda';
   const tipoArray = getPillVals('pg-tipo');
   const tipoStr = tipoArray.length ? tipoArray.join('/') : 'propiedades';
