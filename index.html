@@ -1604,7 +1604,18 @@
         <div id="settings-templates-list" style="display: flex; flex-direction: column; gap: 16px;">
           <!-- Se autogeneran los 7 inputs con javascript -->
         </div>
-        
+
+        <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);">Formulario publico de clientes</div>
+          <div style="font-size: 12px; color: var(--text-m); line-height: 1.6;">
+            Copia o abre el link del formulario publico para compartirlo por WhatsApp, redes o donde quieras captar clientes.
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button class="btn btn-primary btn-sm" onclick="copyPublicFormLink()">🔗 Copiar link del formulario</button>
+            <button class="btn btn-ghost btn-sm" onclick="openPublicFormLink()">🌐 Abrir formulario</button>
+          </div>
+        </div>
+
         <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 10px;">
           <button class="btn btn-ghost" onclick="restoreDefaultTemplates()">Restaurar Valores por Defecto</button>
           <button class="btn btn-primary" onclick="saveSettings()">💾 Guardar Ajustes</button>
@@ -1646,11 +1657,12 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="f-group">
                 <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 1: Zona</label>
-                <div class="pill-group" id="pg-localidad-zona">
-                  <div class="pill" data-val="Capital Federal" onclick="selectLocalidadZona('Capital Federal')">Capital Federal</div>
-                  <div class="pill" data-val="Gran Buenos Aires" onclick="selectLocalidadZona('Gran Buenos Aires')">Gran Buenos Aires</div>
-                  <div class="pill" data-val="Interior Provincia" onclick="selectLocalidadZona('Interior Provincia')">Interior Provincia</div>
-                </div>
+                <select id="f-zona" onchange="selectLocalidadZona(this.value)">
+                  <option value="">Seleccionar zona...</option>
+                  <option value="Capital Federal">Capital Federal</option>
+                  <option value="Gran Buenos Aires">Gran Buenos Aires</option>
+                  <option value="Interior Provincia">Interior Provincia</option>
+                </select>
               </div>
               <div class="f-group">
                 <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 2: Lugar Específico</label>
@@ -1661,7 +1673,7 @@
             </div>
           </div>
           <div class="f-group f-full">
-            <label>🏘️ Barrio de Interés (Etiquetas múltiples)</label>
+            <label>🏘️ Barrio de Interés (Opcional)</label>
             <div class="tags-input-container" onclick="document.getElementById('f-barrio-input').focus()">
               <div id="barrios-tags-list" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;"></div>
               <input type="text" id="f-barrio-input" placeholder="Ej: Palermo, Belgrano..." onkeydown="handleBarrioInputKey(event)">
@@ -1785,7 +1797,7 @@
             </div>
           </div>
           <div class="f-group">
-            <label>Forma de Financiación</label>
+            <label>Forma de pago</label>
             <div class="pill-group" id="pg-financiacion">
               <div class="pill" data-val="Anticipo y saldo financiado" onclick="pickPill('pg-financiacion','Anticipo y saldo financiado',false,this)">📑 Anticipo y saldo financiado</div>
               <div class="pill" data-val="Contado" onclick="pickPill('pg-financiacion','Contado',false,this)">💵 Contado</div>
@@ -3060,11 +3072,11 @@ function openModal(id = null) {
     const locVal = l.localidad || '';
     const zona = getZonaByLocalidad(locVal);
     if (zona) {
-      syncPillGroup('pg-localidad-zona', zona, false);
+      setF('f-zona', zona);
       populateLocalidades(zona);
       setF('f-localidad', locVal);
     } else {
-      syncPillGroup('pg-localidad-zona', '', false);
+      setF('f-zona', '');
       const locSelect = document.getElementById('f-localidad');
       if (locSelect) {
         locSelect.innerHTML = '<option value="">Seleccione una zona primero...</option>';
@@ -3125,7 +3137,7 @@ function openModal(id = null) {
     ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
     
     // Reset Localidad
-    syncPillGroup('pg-localidad-zona', '', false);
+    setF('f-zona', '');
     const locSelect = document.getElementById('f-localidad');
     if (locSelect) {
       locSelect.innerHTML = '<option value="">Seleccione una zona primero...</option>';
@@ -3367,24 +3379,24 @@ function updateProxBadge(dateStr) {
 
 /* ─── LOCALIDAD SELECTOR HELPERS ─── */
 function selectLocalidadZona(zona) {
-  const container = document.getElementById('pg-localidad-zona');
-  if (!container) return;
-  container.querySelectorAll('.pill').forEach(p => {
-    if (p.getAttribute('data-val') === zona) {
-      p.classList.add('on');
-    } else {
-      p.classList.remove('on');
-    }
-  });
+  const zonaSelect = document.getElementById('f-zona');
+  if (zonaSelect && zonaSelect.value !== zona) {
+    zonaSelect.value = zona;
+  }
   populateLocalidades(zona);
 }
 
 function populateLocalidades(zona) {
   const locSelect = document.getElementById('f-localidad');
   if (!locSelect) return;
-  locSelect.disabled = false;
+  locSelect.disabled = !zona;
   
   let optionsHtml = '<option value="">Seleccionar lugar...</option>';
+  if (!zona) {
+    locSelect.innerHTML = '<option value="">Seleccione una zona primero...</option>';
+    locSelect.value = '';
+    return;
+  }
   if (LOCALIDADES_DATA[zona]) {
     LOCALIDADES_DATA[zona].forEach(loc => {
       optionsHtml += `<option value="${loc}">${loc}</option>`;
@@ -4306,6 +4318,7 @@ function renderAgendaDay(dateStr) {
    MÓDULO 4 ─ AJUSTES / PLANTILLAS DE WHATSAPP
 ════════════════════════════════════════════ */
 const SETTINGS_KEY = 'click24_settings';
+const PUBLIC_FORM_URL = 'https://click24web.github.io/CRM.Friedrich/registro.html';
 
 const DEFAULT_TEMPLATES = [
   { id: 1, label: '👋 Contacto Inicial (Nuevo)',       text: 'Hola {nombre}, ¿cómo estás? Te escribo de Click24Web por tu interés en la {operacion} de {tipo}. ¿Cómo es tu disponibilidad para conversar brevemente hoy?' },
@@ -4356,6 +4369,29 @@ function restoreDefaultTemplates() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
   renderSettingsPanel();
   toast('🔄 Plantillas restauradas a los valores originales', 'ok');
+}
+
+async function copyPublicFormLink() {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(PUBLIC_FORM_URL);
+    } else {
+      const input = document.createElement('input');
+      input.value = PUBLIC_FORM_URL;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+    }
+    toast('✅ Link del formulario copiado', 'ok');
+  } catch (e) {
+    console.error('No se pudo copiar el link del formulario:', e);
+    toast('⚠️ No se pudo copiar automáticamente', 'warning');
+  }
+}
+
+function openPublicFormLink() {
+  window.open(PUBLIC_FORM_URL, '_blank', 'noopener');
 }
 
 function getTemplateText(id) {

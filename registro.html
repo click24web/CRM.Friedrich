@@ -481,7 +481,12 @@
               </div>
               <div class="field">
                 <label class="label-soft">Paso 1: zona</label>
-                <div class="pill-group" id="zona-group"></div>
+                <select id="zona" name="zona">
+                  <option value="">Seleccionar zona...</option>
+                  <option value="Capital Federal">Capital Federal</option>
+                  <option value="Gran Buenos Aires">Gran Buenos Aires</option>
+                  <option value="Interior Provincia">Interior Provincia</option>
+                </select>
               </div>
               <div class="field">
                 <label for="localidad">Paso 2: lugar especifico</label>
@@ -490,7 +495,7 @@
                 </select>
               </div>
               <div class="field-full">
-                <label for="barrio-input">Barrios de interes</label>
+                <label for="barrio-input">Barrios de interes (opcional)</label>
                 <div class="tag-box" id="barrio-box">
                   <div id="barrios-list"></div>
                   <input id="barrio-input" type="text" placeholder="Ej: Palermo, Belgrano..." autocomplete="off">
@@ -558,7 +563,7 @@
                 <div class="pill-group" id="credito-group"></div>
               </div>
               <div class="field-full">
-                <label>Forma de financiacion</label>
+                <label>Forma de pago</label>
                 <div class="pill-group" id="financiacion-group"></div>
               </div>
             </div>
@@ -709,12 +714,10 @@
       });
     }
 
-    function renderZonaPills() {
-      renderSinglePills('zona-group', ZONAS, selectedZona, zona => {
-        selectedZona = zona;
-        renderZonaPills();
-        populateLocalidades(zona);
-      });
+    function syncZonaSelect() {
+      const zonaSelect = document.getElementById('zona');
+      if (!zonaSelect) return;
+      zonaSelect.value = selectedZona;
     }
 
     function populateLocalidades(zona) {
@@ -731,6 +734,12 @@
         option.textContent = loc;
         select.appendChild(option);
       });
+    }
+
+    function handleZonaChange(zona) {
+      selectedZona = zona;
+      syncZonaSelect();
+      populateLocalidades(zona);
     }
 
     function renderBarrios() {
@@ -892,7 +901,7 @@
       selectedFinanciacion = '';
       document.getElementById('localidad').innerHTML = '<option value="">Seleccionar una zona primero...</option>';
       document.getElementById('localidad').disabled = true;
-      renderZonaPills();
+      syncZonaSelect();
       renderBarrios();
       renderOperacion();
       renderTipos();
@@ -968,7 +977,7 @@
     }
 
     function init() {
-      renderZonaPills();
+      syncZonaSelect();
       renderBarrios();
       renderOperacion();
       renderTipos();
@@ -976,6 +985,7 @@
       renderFinanciacion();
 
       document.getElementById('public-lead-form').addEventListener('submit', submitPublicLead);
+      document.getElementById('zona').addEventListener('change', event => handleZonaChange(event.target.value));
       document.getElementById('barrio-box').addEventListener('click', () => {
         document.getElementById('barrio-input').focus();
       });
