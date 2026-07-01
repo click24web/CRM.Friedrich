@@ -59,6 +59,11 @@
       --pill-multi-bg: #374151;
       --shadow:      0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
       --gradient-primary: linear-gradient(135deg, #7c3aed, #4f46e5);
+      --scroll-track: rgba(167, 139, 250, 0.18);
+      --scroll-thumb: linear-gradient(180deg, #c4b5fd, #a78bfa);
+      --scroll-thumb-solid: #a78bfa;
+      --scroll-thumb-active: linear-gradient(180deg, #8b5cf6, #6d28d9);
+      --scroll-thumb-active-solid: #7c3aed;
       --t:           .18s ease;
     }
 
@@ -76,9 +81,20 @@
       --pill-multi-bg: #4b5563;
       --shadow:      0 12px 40px -12px rgba(0, 0, 0, 0.5), 0 1px 5px rgba(255, 255, 255, 0.02);
       --gradient-primary: linear-gradient(135deg, #8b5cf6, #6366f1);
+      --scroll-track: rgba(109, 40, 217, 0.2);
+      --scroll-thumb: linear-gradient(180deg, #a78bfa, #8b5cf6);
+      --scroll-thumb-solid: #8b5cf6;
+      --scroll-thumb-active: linear-gradient(180deg, #c084fc, #7c3aed);
+      --scroll-thumb-active-solid: #a855f7;
     }
 
-    html, body { height: 100%; overflow: hidden; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
@@ -86,13 +102,29 @@
       color: var(--text);
       display: flex;
       height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
     }
 
     /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: var(--surface2); }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scroll-thumb-solid) var(--scroll-track);
+    }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track {
+      background: var(--scroll-track);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scroll-thumb);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background: var(--scroll-thumb-active);
+    }
 
     /* ══════════════════════════════════════
        SIDEBAR
@@ -201,6 +233,10 @@
        MAIN AREA
     ══════════════════════════════════════ */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    button, a, input, select, textarea, summary, [role="button"] {
+      touch-action: manipulation;
+    }
 
     /* TOPBAR */
     .topbar {
@@ -762,6 +798,10 @@
     .menu-btn { display: none; }
     
     @media (max-width: 1024px) {
+      body {
+        height: 100dvh;
+      }
+
       .menu-btn {
         display: inline-flex;
         font-size: 18px;
@@ -820,6 +860,13 @@
     }
 
     @media (max-width: 600px) {
+      input,
+      select,
+      textarea,
+      button {
+        font-size: 16px !important;
+      }
+
       .topbar {
         height: auto;
         padding: 12px 14px;
@@ -831,6 +878,9 @@
         width: 100%;
         max-width: 100%;
         margin-top: 4px;
+      }
+      .search-box input {
+        font-size: 16px;
       }
       .topbar-title {
         font-size: 17px;
@@ -1000,6 +1050,11 @@
     .bulk-actions {
       display: flex;
       gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+    .bulk-actions .btn {
+      flex-shrink: 0;
     }
     .bulk-queue-item {
       transition: border-color var(--t), background var(--t);
@@ -1147,12 +1202,35 @@
 
       /* Bulk action bar ajustado al ancho */
       .bulk-action-bar {
+        left: 14px !important;
+        right: 14px !important;
         min-width: 0 !important;
-        width: calc(100% - 28px) !important;
+        width: auto !important;
+        max-width: none !important;
         bottom: 16px !important;
+        transform: translateY(100px) !important;
         padding: 12px 16px !important;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: stretch;
         gap: 10px !important;
+      }
+      .bulk-action-bar.open {
+        transform: translateY(0) !important;
+      }
+      .bulk-info {
+        width: 100%;
+        font-size: 13px;
+      }
+      .bulk-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .bulk-actions .btn {
+        width: 100%;
+        justify-content: center;
+        margin: 0;
       }
 
       /* Kanban: scroll horizontal */
@@ -1211,6 +1289,46 @@
       #funnel-container > div > div:first-child {
         display: none !important;
       }
+      .bulk-action-bar {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 12px !important;
+        padding: 10px 12px !important;
+      }
+    }
+
+    .sidebar-footer .btn {
+      width: 100%;
+      margin-bottom: 8px;
+      justify-content: center;
+      gap: 8px;
+      border-width: 1px;
+    }
+    body:not(.dark) .sidebar-footer .btn-ghost {
+      background: linear-gradient(180deg, #ffffff, #f6f7fb);
+      border-color: #d1d5db;
+      color: #374151;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    }
+    body:not(.dark) .sidebar-footer .btn-ghost:hover {
+      background: #f3f4f6;
+      color: #111827;
+      border-color: #9ca3af;
+    }
+    body:not(.dark) #theme-toggle {
+      border-color: #f59e0b !important;
+      color: #111827;
+      background: linear-gradient(180deg, #fff7ed, #fffbeb);
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.14);
+    }
+    body:not(.dark) #theme-toggle:hover {
+      background: linear-gradient(180deg, #ffedd5, #fef3c7);
+    }
+    body:not(.dark) .sidebar-footer .btn-manual {
+      color: var(--secondary) !important;
+    }
+    body.dark .sidebar-footer .btn-ghost {
+      border-color: var(--border2);
     }
   </style>
 </head>
@@ -1257,10 +1375,10 @@
   </nav>
 
   <div class="sidebar-footer">
-    <button class="btn btn-ghost btn-sm" id="theme-toggle" onclick="toggleTheme()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--border2);">
+    <button class="btn btn-ghost btn-sm" id="theme-toggle" onclick="toggleTheme()" style="border-color: var(--border2);">
       <span id="theme-icon">🌙</span> <span id="theme-text">Modo Oscuro</span>
     </button>
-    <button class="btn btn-ghost btn-sm" onclick="downloadManual()" style="width: 100%; margin-bottom: 8px; justify-content: center; gap: 8px; border-color: var(--border2); color: var(--secondary);">
+    <button class="btn btn-ghost btn-sm btn-manual" onclick="downloadManual()" style="border-color: var(--border2); color: var(--secondary);">
       📖 Descargar Manual
     </button>
     <div class="db-badge">
@@ -1670,11 +1788,9 @@
             <label>Forma de Financiación</label>
             <div class="pill-group" id="pg-financiacion">
               <div class="pill" data-val="Anticipo y saldo financiado" onclick="pickPill('pg-financiacion','Anticipo y saldo financiado',false,this)">📑 Anticipo y saldo financiado</div>
-              <div class="pill" data-val="Compra con permuta" onclick="pickPill('pg-financiacion','Compra con permuta',false,this)">🔄 Compra con permuta</div>
               <div class="pill" data-val="Contado" onclick="pickPill('pg-financiacion','Contado',false,this)">💵 Contado</div>
-              <div class="pill" data-val="Crédito hipotecario" onclick="pickPill('pg-financiacion','Crédito hipotecario',false,this)">🏦 Crédito hipotecario</div>
               <div class="pill" data-val="En pozo" onclick="pickPill('pg-financiacion','En pozo',false,this)">🏗️ En pozo</div>
-              <div class="pill" data-val="Financiación del propietario" onclick="pickPill('pg-financiacion','Financiación del propietario',false,this)">🤝 Financiación del propietario</div>
+              <div class="pill" data-val="Financiación particular" onclick="pickPill('pg-financiacion','Financiación particular',false,this)">🤝 Financiación particular</div>
               <div class="pill" data-val="Sin definir" onclick="pickPill('pg-financiacion','Sin definir',false,this)">❓ Sin definir</div>
             </div>
           </div>
@@ -3351,9 +3467,9 @@ function updateFinanciacion(operacion, selectedVal = null) {
     `).join('');
   } else {
     const options = [
+      { val: 'Pago anual', label: '🔑 Pago anual' },
       { val: 'Pago mensual', label: '📅 Pago mensual' },
-      { val: 'Pago semestral', label: '📆 Pago semestral' },
-      { val: 'Pago anual', label: '🔑 Pago anual' }
+      { val: 'Pago semestral', label: '📆 Pago semestral' }
     ];
     html = options.map(opt => `
       <div class="pill" data-val="${opt.val}" onclick="pickPill('pg-financiacion','${opt.val}',false,this)">${opt.label}</div>
