@@ -436,8 +436,15 @@
         min-width: 0;
       }
 
+      .pill {
+        min-height: 44px;
+        justify-content: center;
+      }
+
       .actions small {
+        order: 2;
         max-width: none;
+        text-align: center;
       }
 
       input,
@@ -484,7 +491,7 @@
                 <select id="zona" name="zona">
                   <option value="">Seleccionar zona...</option>
                   <option value="Capital Federal">Capital Federal</option>
-                  <option value="Gran Buenos Aires">Gran Buenos Aires</option>
+                  <option value="Gran Buenos Aires">Gran Buenos Aires / AMBA</option>
                   <option value="Interior Provincia">Interior Provincia</option>
                 </select>
               </div>
@@ -611,29 +618,53 @@
       : null;
 
     const ZONAS = ['Capital Federal', 'Gran Buenos Aires', 'Interior Provincia'];
-    const LOCALIDADES_DATA = {
-      'Capital Federal': [
-        'Agronomia', 'Almagro', 'Balvanera', 'Barracas', 'Belgrano', 'Boedo', 'Caballito', 'Chacarita',
-        'Coghlan', 'Colegiales', 'Constitucion', 'Flores', 'Floresta', 'La Boca', 'La Paternal',
-        'Liniers', 'Mataderos', 'Monte Castro', 'Monserrat', 'Nueva Pompeya', 'Nunez', 'Palermo',
-        'Parque Avellaneda', 'Parque Chacabuco', 'Parque Chas', 'Parque Patricios', 'Puerto Madero',
-        'Recoleta', 'Retiro', 'Saavedra', 'San Cristobal', 'San Nicolas', 'San Telmo', 'Velez Sarsfield',
-        'Versalles', 'Villa Crespo', 'Villa del Parque', 'Villa Devoto', 'Villa General Mitre',
-        'Villa Lugano', 'Villa Luro', 'Villa Ortuzar', 'Villa Pueyrredon', 'Villa Real', 'Villa Riachuelo',
-        'Villa Santa Rita', 'Villa Soldati', 'Villa Urquiza'
-      ],
-      'Gran Buenos Aires': [
-        'GBA Norte', 'GBA Sur', 'GBA Oeste',
-        'San Isidro', 'Tigre', 'Vicente Lopez', 'San Fernando', 'Pilar', 'Escobar',
-        'Avellaneda', 'Lanus', 'Lomas de Zamora', 'Quilmes', 'Almirante Brown', 'Esteban Echeverria', 'Ezeiza', 'Berazategui',
-        'Moron', 'La Matanza', 'Tres de Febrero', 'San Martin', 'Ituzaingo', 'Hurlingham', 'Merlo', 'Moreno', 'San Miguel'
-      ],
-      'Interior Provincia': [
-        'La Plata', 'Mar del Plata', 'Bahia Blanca', 'Tandil', 'Necochea', 'Pinamar', 'Villa Gesell',
-        'San Nicolas de los Arroyos', 'Chivilcoy', 'Pergamino', 'Junin', 'Olavarria', 'Azul',
-        'Campana', 'Zarate', 'Lujan', 'Mercedes'
-      ]
-    };
+    const sortStringsEs = items => [...items].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const LOCALIDADES_DATA = Object.fromEntries(
+      Object.entries({
+        'Capital Federal': [
+          'Agronomia', 'Almagro', 'Balvanera', 'Barracas', 'Belgrano', 'Boedo', 'Caballito', 'Chacarita',
+          'Coghlan', 'Colegiales', 'Constitucion', 'Flores', 'Floresta', 'La Boca', 'La Paternal',
+          'Liniers', 'Mataderos', 'Monte Castro', 'Montserrat', 'Nueva Pompeya', 'Nunez', 'Palermo',
+          'Parque Avellaneda', 'Parque Chacabuco', 'Parque Chas', 'Parque Patricios', 'Puerto Madero',
+          'Recoleta', 'Retiro', 'Saavedra', 'San Cristobal', 'San Nicolas', 'San Telmo', 'Velez Sarsfield',
+          'Versalles', 'Villa Crespo', 'Villa del Parque', 'Villa Devoto', 'Villa General Mitre',
+          'Villa Lugano', 'Villa Luro', 'Villa Ortuzar', 'Villa Pueyrredon', 'Villa Real', 'Villa Riachuelo',
+          'Villa Santa Rita', 'Villa Soldati', 'Villa Urquiza'
+        ],
+        'Gran Buenos Aires': [
+          'Almirante Brown', 'Avellaneda', 'Berazategui', 'Berisso', 'Brandsen', 'Campana',
+          'Canuelas', 'Ensenada', 'Escobar', 'Esteban Echeverria', 'Exaltacion de la Cruz',
+          'Ezeiza', 'Florencio Varela', 'General Las Heras', 'General Rodriguez',
+          'General San Martin', 'Hurlingham', 'Ituzaingo', 'Jose C. Paz', 'La Matanza',
+          'La Plata', 'Lanus', 'Lomas de Zamora', 'Lujan', 'Malvinas Argentinas',
+          'Marcos Paz', 'Merlo', 'Moreno', 'Moron', 'Pilar', 'Presidente Peron',
+          'Quilmes', 'San Fernando', 'San Isidro', 'San Miguel', 'San Vicente',
+          'Tigre', 'Tres de Febrero', 'Vicente Lopez', 'Zarate'
+        ],
+        'Interior Provincia': [
+          'Adolfo Alsina', 'Adolfo Gonzales Chaves', 'Alberti', 'Arrecifes', 'Ayacucho',
+          'Azul', 'Bahia Blanca', 'Balcarce', 'Baradero', 'Benito Juarez', 'Bolivar',
+          'Bragado', 'Capitan Sarmiento', 'Carlos Casares', 'Carlos Tejedor',
+          'Carmen de Areco', 'Castelli', 'Chacabuco', 'Chascomus', 'Chivilcoy',
+          'Colon', 'Coronel Dorrego', 'Coronel Pringles', 'Coronel Rosales',
+          'Coronel Suarez', 'Daireaux', 'Dolores', 'Florentino Ameghino',
+          'General Alvarado', 'General Alvear', 'General Arenales', 'General Belgrano',
+          'General Guido', 'General La Madrid', 'General Lavalle', 'General Madariaga',
+          'General Paz', 'General Pinto', 'General Pueyrredon', 'General Viamonte',
+          'General Villegas', 'Guamini', 'Hipolito Yrigoyen', 'Junin', 'La Costa',
+          'Laprida', 'Las Flores', 'Leandro N. Alem', 'Lezama', 'Lincoln', 'Loberia',
+          'Lobos', 'Magdalena', 'Maipu', 'Mar Chiquita', 'Mercedes', 'Monte',
+          'Monte Hermoso', 'Navarro', 'Necochea', 'Nueve de Julio', 'Olavarria',
+          'Patagones', 'Pehuajo', 'Pellegrini', 'Pergamino', 'Pila', 'Pinamar',
+          'Puan', 'Punta Indio', 'Ramallo', 'Rauch', 'Rivadavia', 'Rojas',
+          'Roque Perez', 'Saavedra', 'Saladillo', 'Salliquelo', 'Salto',
+          'San Andres de Giles', 'San Antonio de Areco', 'San Cayetano',
+          'San Nicolas', 'San Pedro', 'Suipacha', 'Tandil', 'Tapalque', 'Tordillo',
+          'Tornquist', 'Trenque Lauquen', 'Tres Arroyos', 'Tres Lomas',
+          'Veinticinco de Mayo', 'Villa Gesell', 'Villarino'
+        ]
+      }).map(([zona, localidades]) => [zona, sortStringsEs(localidades)])
+    );
 
     const OPERACIONES = [
       'Compra',
@@ -643,10 +674,10 @@
     ];
 
     const TIPOS = [
-      'Departamento', 'Casa', 'PH', 'Monoambiente', 'Duplex', 'Triplex',
-      'Loft', 'Oficina', 'Local comercial', 'Terreno', 'Lote', 'Galpon',
-      'Cochera', 'Quinta', 'Casa quinta', 'Chalet'
-    ];
+      'Casa', 'Casa quinta', 'Chalet', 'Cochera', 'Departamento',
+      'Duplex', 'Galpon', 'Local comercial', 'Loft', 'Lote',
+      'Monoambiente', 'Oficina', 'PH', 'Quinta', 'Terreno', 'Triplex'
+    ].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
 
     const CREDITOS = ['Si', 'No', 'En tramite', 'No aplica'];
     const FINANCIACION_COMPRA = [

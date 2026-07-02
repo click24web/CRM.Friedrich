@@ -283,6 +283,15 @@
     .btn-danger:hover { background: rgba(239,68,68,.22); }
     .btn-sm { padding: 6px 12px; font-size: 12px; }
     .btn-icon { width: 34px; height: 34px; padding: 0; justify-content: center; }
+    .topbar-actions,
+    .page-actions,
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-row-end { justify-content: flex-end; }
+    .btn-row-between { justify-content: space-between; }
 
     /* ── VIEWS ── */
     .view { flex: 1; overflow-y: auto; padding: 22px; display: none; }
@@ -867,6 +876,16 @@
         font-size: 16px !important;
       }
 
+      .btn:not(.btn-icon) {
+        min-height: 44px;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .pill {
+        min-height: 44px;
+      }
+
       .topbar {
         height: auto;
         padding: 12px 14px;
@@ -885,6 +904,13 @@
       .topbar-title {
         font-size: 17px;
       }
+      .topbar-actions {
+        width: 100%;
+      }
+      .topbar-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
       
       .view {
         padding: 12px 14px;
@@ -898,6 +924,17 @@
       }
       .page-hd div {
         width: 100%;
+      }
+      .page-hd > .btn,
+      .page-actions,
+      .btn-row {
+        width: 100%;
+      }
+      .page-hd > .btn,
+      .page-actions .btn,
+      .btn-row .btn {
+        width: 100%;
+        justify-content: center;
       }
       .page-hd div[style*="display:flex"], 
       .page-hd div[style*="display: flex"] {
@@ -950,10 +987,40 @@
       .modal-ft {
         padding: 12px 14px;
         gap: 6px;
+        flex-direction: column;
+        align-items: stretch;
       }
-      .modal-ft button {
-        font-size: 12px;
-        padding: 8px 12px;
+      .modal-ft button,
+      .modal-ft .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .modal-ft > div {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 8px !important;
+        margin-left: 0 !important;
+      }
+      #btn-del,
+      #cal-note-delete-btn {
+        margin-right: 0 !important;
+      }
+      #quick-contact-overlay .status-btn-row {
+        flex-direction: column;
+      }
+      #quick-contact-overlay .status-btn-row .btn {
+        width: 100%;
+      }
+      #calendar-note-color-picker {
+        flex-wrap: wrap;
+      }
+      .wa-menu {
+        position: fixed;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto;
+        max-width: none;
       }
     }
 
@@ -1406,7 +1473,7 @@
       </div>
       <div id="search-suggestions" class="search-suggestions" style="display: none;"></div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div class="topbar-actions">
       <button class="btn btn-primary" onclick="openModal()">＋ Nuevo</button>
     </div>
   </header>
@@ -1476,7 +1543,7 @@
         <div class="page-title">Clientes</div>
         <div class="page-sub" id="cl-count"></div>
       </div>
-      <div style="display:flex;gap:8px">
+      <div class="page-actions">
         <button class="btn btn-ghost" onclick="exportCSV()">📤 Exportar CSV</button>
         <button class="btn btn-primary" onclick="openModal()">＋ Nuevo Cliente</button>
       </div>
@@ -1610,13 +1677,13 @@
           <div style="font-size: 12px; color: var(--text-m); line-height: 1.6;">
             Copia o abre el link del formulario publico para compartirlo por WhatsApp, redes o donde quieras captar clientes.
           </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <div class="btn-row">
             <button class="btn btn-primary btn-sm" onclick="copyPublicFormLink()">🔗 Copiar link del formulario</button>
             <button class="btn btn-ghost btn-sm" onclick="openPublicFormLink()">🌐 Abrir formulario</button>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 10px;">
+        <div class="btn-row btn-row-end" style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 10px;">
           <button class="btn btn-ghost" onclick="restoreDefaultTemplates()">Restaurar Valores por Defecto</button>
           <button class="btn btn-primary" onclick="saveSettings()">💾 Guardar Ajustes</button>
         </div>
@@ -1660,7 +1727,7 @@
                 <select id="f-zona" onchange="selectLocalidadZona(this.value)">
                   <option value="">Seleccionar zona...</option>
                   <option value="Capital Federal">Capital Federal</option>
-                  <option value="Gran Buenos Aires">Gran Buenos Aires</option>
+                  <option value="Gran Buenos Aires">Gran Buenos Aires / AMBA</option>
                   <option value="Interior Provincia">Interior Provincia</option>
                 </select>
               </div>
@@ -1867,7 +1934,7 @@
           <span style="font-size: 16px;">⚠️</span>
           <span>Ya existe un cliente con ese teléfono: <span id="phone-dup-info" style="font-weight: 700;"></span></span>
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <div class="btn-row btn-row-end">
           <button class="btn btn-ghost btn-sm" onclick="hidePhoneWarning()">Cancelar</button>
           <button class="btn btn-primary btn-sm" style="background: var(--warning); border-color: var(--warning); box-shadow: none;" onclick="saveClient(true)">Guardar igual</button>
         </div>
@@ -1962,7 +2029,7 @@
       
       <div class="f-group">
         <label>¿Pudiste contactarlo?</label>
-        <div style="display: flex; gap: 10px; margin-top: 6px;">
+        <div class="btn-row status-btn-row" style="margin-top: 6px;">
           <button class="btn btn-ghost" id="btn-qc-yes" onclick="setQuickContactStatus(true)" style="flex: 1; border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.05); font-weight: 700;">Sí, conversamos ✅</button>
           <button class="btn btn-ghost" id="btn-qc-no" onclick="setQuickContactStatus(false)" style="flex: 1; border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.05); font-weight: 700;">No contestó ❌</button>
         </div>
@@ -2013,7 +2080,7 @@
       </div>
       <div class="f-group">
         <label>Color de etiqueta</label>
-        <div style="display: flex; gap: 8px; margin-top: 6px;" id="cal-note-color-picker">
+        <div class="btn-row" style="margin-top: 6px;" id="cal-note-color-picker">
           <button onclick="selectNoteColor('#7c3aed')" data-color="#7c3aed" style="width: 26px; height: 26px; border-radius: 50%; background: #7c3aed; border: 3px solid transparent; cursor: pointer; transition: transform var(--t), border-color var(--t);" title="Violeta"></button>
           <button onclick="selectNoteColor('#3b82f6')" data-color="#3b82f6" style="width: 26px; height: 26px; border-radius: 50%; background: #3b82f6; border: 3px solid transparent; cursor: pointer; transition: transform var(--t), border-color var(--t);" title="Azul"></button>
           <button onclick="selectNoteColor('#10b981')" data-color="#10b981" style="width: 26px; height: 26px; border-radius: 50%; background: #10b981; border: 3px solid transparent; cursor: pointer; transition: transform var(--t), border-color var(--t);" title="Verde"></button>
@@ -2025,7 +2092,7 @@
     </div>
     <div class="modal-ft" style="margin-top: 16px; display: flex; justify-content: space-between; gap: 8px;">
       <button class="btn btn-danger btn-sm" id="cal-note-delete-btn" onclick="deleteCalendarNote()" style="display:none;">🗑️ Eliminar</button>
-      <div style="display: flex; gap: 8px; margin-left: auto;">
+      <div class="btn-row btn-row-end" style="margin-left: auto;">
         <button class="btn btn-ghost" onclick="closeCalendarNoteModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveCalendarNote()">💾 Guardar Nota</button>
       </div>
@@ -2187,9 +2254,68 @@ const LOCALIDADES_DATA = {
   ]
 };
 
+const sortStringsEs = items => [...items].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+
+LOCALIDADES_DATA["Capital Federal"] = sortStringsEs([
+  "Agronomia", "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo", "Caballito", "Chacarita",
+  "Coghlan", "Colegiales", "Constitucion", "Flores", "Floresta", "La Boca", "La Paternal",
+  "Liniers", "Mataderos", "Monte Castro", "Montserrat", "Nueva Pompeya", "Nunez", "Palermo",
+  "Parque Avellaneda", "Parque Chacabuco", "Parque Chas", "Parque Patricios", "Puerto Madero",
+  "Recoleta", "Retiro", "Saavedra", "San Cristobal", "San Nicolas", "San Telmo", "Velez Sarsfield",
+  "Versalles", "Villa Crespo", "Villa del Parque", "Villa Devoto", "Villa General Mitre",
+  "Villa Lugano", "Villa Luro", "Villa Ortuzar", "Villa Pueyrredon", "Villa Real", "Villa Riachuelo",
+  "Villa Santa Rita", "Villa Soldati", "Villa Urquiza"
+]);
+
+LOCALIDADES_DATA["Gran Buenos Aires"] = sortStringsEs([
+  "Almirante Brown", "Avellaneda", "Berazategui", "Berisso", "Brandsen", "Campana",
+  "Canuelas", "Ensenada", "Escobar", "Esteban Echeverria", "Exaltacion de la Cruz",
+  "Ezeiza", "Florencio Varela", "General Las Heras", "General Rodriguez",
+  "General San Martin", "Hurlingham", "Ituzaingo", "Jose C. Paz", "La Matanza",
+  "La Plata", "Lanus", "Lomas de Zamora", "Lujan", "Malvinas Argentinas",
+  "Marcos Paz", "Merlo", "Moreno", "Moron", "Pilar", "Presidente Peron",
+  "Quilmes", "San Fernando", "San Isidro", "San Miguel", "San Vicente",
+  "Tigre", "Tres de Febrero", "Vicente Lopez", "Zarate"
+]);
+
+LOCALIDADES_DATA["Interior Provincia"] = sortStringsEs([
+  "Adolfo Alsina", "Adolfo Gonzales Chaves", "Alberti", "Arrecifes", "Ayacucho",
+  "Azul", "Bahia Blanca", "Balcarce", "Baradero", "Benito Juarez", "Bolivar",
+  "Bragado", "Capitan Sarmiento", "Carlos Casares", "Carlos Tejedor",
+  "Carmen de Areco", "Castelli", "Chacabuco", "Chascomus", "Chivilcoy",
+  "Colon", "Coronel Dorrego", "Coronel Pringles", "Coronel Rosales",
+  "Coronel Suarez", "Daireaux", "Dolores", "Florentino Ameghino",
+  "General Alvarado", "General Alvear", "General Arenales", "General Belgrano",
+  "General Guido", "General La Madrid", "General Lavalle", "General Madariaga",
+  "General Paz", "General Pinto", "General Pueyrredon", "General Viamonte",
+  "General Villegas", "Guamini", "Hipolito Yrigoyen", "Junin", "La Costa",
+  "Laprida", "Las Flores", "Leandro N. Alem", "Lezama", "Lincoln", "Loberia",
+  "Lobos", "Magdalena", "Maipu", "Mar Chiquita", "Mercedes", "Monte",
+  "Monte Hermoso", "Navarro", "Necochea", "Nueve de Julio", "Olavarria",
+  "Patagones", "Pehuajo", "Pellegrini", "Pergamino", "Pila", "Pinamar",
+  "Puan", "Punta Indio", "Ramallo", "Rauch", "Rivadavia", "Rojas",
+  "Roque Perez", "Saavedra", "Saladillo", "Salliquelo", "Salto",
+  "San Andres de Giles", "San Antonio de Areco", "San Cayetano",
+  "San Nicolas", "San Pedro", "Suipacha", "Tandil", "Tapalque", "Tordillo",
+  "Tornquist", "Trenque Lauquen", "Tres Arroyos", "Tres Lomas",
+  "Veinticinco de Mayo", "Villa Gesell", "Villarino"
+]);
+
 function getZonaByLocalidad(locValue) {
+  const normalizedLocValue = String(locValue || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
   for (const [zona, list] of Object.entries(LOCALIDADES_DATA)) {
-    if (list.includes(locValue)) return zona;
+    if (list.some(loc =>
+      String(loc || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim() === normalizedLocValue
+    )) return zona;
   }
   return '';
 }
@@ -3665,6 +3791,18 @@ function updateThemeUI(isDark) {
 }
 
 /* ─── WHATSAPP TEMPLATES ─── */
+function sortPillGroupAlphabetically(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+
+  const pills = Array.from(group.querySelectorAll('.pill'));
+  pills
+    .sort((a, b) =>
+      (a.dataset.val || '').localeCompare(b.dataset.val || '', 'es', { sensitivity: 'base' })
+    )
+    .forEach(pill => group.appendChild(pill));
+}
+
 function showWaTemplates(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -4908,6 +5046,7 @@ loadSettings();
 
 /* ─── INIT ─── */
 initTheme();
+sortPillGroupAlphabetically('pg-tipo');
 loadData();
 initNotifications();
 </script>
