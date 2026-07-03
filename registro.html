@@ -322,31 +322,6 @@
       color: #b45309;
     }
 
-    .consent-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 16px;
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-    }
-
-    .consent-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      margin-top: 1px;
-      accent-color: var(--primary);
-      flex-shrink: 0;
-    }
-
-    .consent-row label {
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
     .actions {
       display: flex;
       align-items: center;
@@ -582,14 +557,6 @@
               <div class="field-full">
                 <label for="notas">Detalles importantes</label>
                 <textarea id="notas" name="notas" placeholder="Ej: busco balcon, apto profesional, cerca del subte, mudanza urgente, etc."></textarea>
-              </div>
-              <div class="field-full">
-                <div class="consent-row">
-                  <input id="consentimiento" type="checkbox" required>
-                  <label for="consentimiento">
-                    Acepto que me contacten por WhatsApp o telefono para enviarme ofertas y hacer seguimiento de mi busqueda.
-                  </label>
-                </div>
               </div>
             </div>
           </section>
@@ -884,8 +851,7 @@
       const seguimientoTexto = 'Lead ingresado desde formulario publico de registro.';
       const notasCompuestas = [
         notas,
-        selectedBarrios.length ? `Barrios de interes: ${selectedBarrios.join(', ')}` : '',
-        'Consentimiento de contacto: Si'
+        selectedBarrios.length ? `Barrios de interes: ${selectedBarrios.join(', ')}` : ''
       ].filter(Boolean).join(' | ');
 
       return {
@@ -948,7 +914,6 @@
 
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
-      const consentimiento = document.getElementById('consentimiento').checked;
 
       if (!nombre) {
         showStatus('error', 'Por favor ingresá tu nombre completo.');
@@ -965,7 +930,7 @@
         return;
       }
 
-      if (!consentimiento) {
+      if (false) {
         showStatus('warning', 'Necesitamos tu autorización para poder contactarte.');
         return;
       }
