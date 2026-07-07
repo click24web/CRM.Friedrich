@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -740,7 +740,7 @@
        SEGUIMIENTO TIMELINE
     ══════════════════════════════════════ */
     .sgt-add-form {
-      display: grid; grid-template-columns: auto 1fr auto;
+      display: grid; grid-template-columns: minmax(150px, auto) minmax(110px, 150px) minmax(0, 1fr) auto;
       gap: 8px; align-items: center;
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: var(--r-sm); padding: 10px 12px;
@@ -762,6 +762,7 @@
       transition: border-color var(--t), box-shadow var(--t);
     }
     .sgt-txt-input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px var(--primary-g); }
+    #sgt-visita-horario { max-width: 150px; }
 
     .sgt-timeline { display: flex; flex-direction: column; }
 
@@ -972,6 +973,9 @@
       .sgt-add-form {
         grid-template-columns: 1fr;
         gap: 8px;
+      }
+      #sgt-visita-horario {
+        max-width: none !important;
       }
       .sgt-add-form button {
         width: 100%;
@@ -1200,6 +1204,12 @@
       .agenda-detail {
         flex: none !important;
         min-height: 280px;
+      }
+      .sgt-add-form {
+        grid-template-columns: 1fr 1fr;
+      }
+      .sgt-add-form button {
+        grid-column: 1 / -1;
       }
     }
 
@@ -2640,7 +2650,7 @@
       <div class="f-section" id="sgt-section" style="display:none">
         <div class="f-section-title">🗂️ Historial de Seguimiento</div>
         <div class="sgt-add-form">
-          <select class="sgt-type-sel" id="sgt-tipo">
+          <select class="sgt-type-sel" id="sgt-tipo" onchange="handleSeguimientoTypeChange()">
             <option value="📞 Llamada">📞 Llamada</option>
             <option value="💬 WhatsApp">💬 WhatsApp</option>
             <option value="🏠 Visita">🏠 Visita</option>
@@ -2648,6 +2658,9 @@
             <option value="📋 Propuesta">📋 Propuesta</option>
             <option value="📝 Nota">📝 Nota</option>
           </select>
+          <input class="sgt-txt-input" type="time" id="sgt-visita-horario"
+            style="display:none; max-width: 150px;"
+            aria-label="Horario de visita">
           <input class="sgt-txt-input" type="text" id="sgt-texto"
             placeholder="Ej: Conversamos, le interesa visitar Palermo..."
             onkeydown="if(event.key==='Enter'){addSeguimiento();event.preventDefault();}">
@@ -2741,6 +2754,10 @@
           <!-- Se autogenera -->
         </div>
       </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeBulkWaModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="sendAllBulkWa()" style="background: linear-gradient(135deg, #25d366, #128c7e); border: none;">Enviar</button>
     </div>
   </div>
 </div>
@@ -3912,6 +3929,8 @@ function exportCSV() {
 function openModal(id = null) {
   const waMenu = document.getElementById('wa-menu');
   if (waMenu) waMenu.style.display = 'none';
+  hidePhoneWarning();
+  resetSeguimientoForm();
   editId = id;
   delPhase = false;
   document.getElementById('del-confirm').style.display = 'none';
@@ -3998,7 +4017,7 @@ function openModal(id = null) {
     updateProxBadge(l.proximoContacto||'');
     renderSeguimiento(l.seguimiento||[]);
   } else {
-    ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto'].forEach(fid=>setF(fid,''));
+    ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto','f-ambientes','f-banos','f-temp-meses'].forEach(fid=>setF(fid,''));
     
     // Reset Localidad
     setF('f-zona', '');
@@ -4012,17 +4031,20 @@ function openModal(id = null) {
     selectedBarrios = [];
     renderBarriosTags();
 
-    setF('f-moneda','USD'); setF('f-ambientes',''); setF('f-banos',''); setF('f-cochera','Indiferente');
+    setF('f-moneda','USD');
+    setF('f-cochera','Indiferente');
+    setF('f-etapa','Nuevo');
+    setF('f-origen','');
     setF('f-fecha', new Date().toISOString().split('T')[0]);
     
     document.getElementById('f-group-temp-months').style.display = 'none';
-    setF('f-temp-meses', '');
     
     syncPillGroup('pg-operacion','Compra',false);
     updateFinanciacion('Compra', '');
     syncPillGroup('pg-credito','No',false);
     syncPillGroup('pg-tipo',[],true);
     document.getElementById('prox-badge').style.display = 'none';
+    renderSeguimiento([]);
   }
 
   document.getElementById('overlay').classList.add('open');
@@ -4175,6 +4197,7 @@ function renderSeguimiento(entries) {
     const col    = SGT_COLORS[e.tipo] || { bg:'rgba(100,100,100,.12)', color:'#666' };
     const isLast = idx === sorted.length - 1;
     const emoji  = e.tipo.split(' ')[0];
+    const timeLabel = e.horarioVisita ? ` · Visita ${e.horarioVisita}` : (e.hora ? ` · ${e.hora}` : '');
     return `
     <div class="sgt-entry">
       <div class="sgt-line-wrap">
@@ -4184,7 +4207,7 @@ function renderSeguimiento(entries) {
       <div class="sgt-content">
         <div class="sgt-header">
           <span class="sgt-type-lbl" style="color:${col.color}">${e.tipo}</span>
-          <span class="sgt-date">${fmtDate(e.fecha)}${e.hora ? ' · ' + e.hora : ''}</span>
+          <span class="sgt-date">${fmtDate(e.fecha)}${timeLabel}</span>
           <button class="sgt-del" onclick="deleteSeguimiento('${e.id}')" title="Eliminar registro">✕</button>
         </div>
         ${e.texto ? `<div class="sgt-text">${e.texto}</div>` : ''}
@@ -4193,30 +4216,61 @@ function renderSeguimiento(entries) {
   }).join('');
 }
 
+function handleSeguimientoTypeChange() {
+  const tipoSel = document.getElementById('sgt-tipo');
+  const horarioInput = document.getElementById('sgt-visita-horario');
+  const textoInput = document.getElementById('sgt-texto');
+  if (!tipoSel || !horarioInput || !textoInput) return;
+
+  const isVisit = tipoSel.value === '🏠 Visita';
+  horarioInput.style.display = isVisit ? 'block' : 'none';
+  if (!isVisit) horarioInput.value = '';
+  textoInput.placeholder = isVisit
+    ? 'Ej: Confirmada con el cliente, lleva a su pareja...'
+    : 'Ej: Conversamos, le interesa visitar Palermo...';
+}
+
+function resetSeguimientoForm() {
+  setF('sgt-tipo', '📞 Llamada');
+  setF('sgt-visita-horario', '');
+  setF('sgt-texto', '');
+  handleSeguimientoTypeChange();
+}
+
 function addSeguimiento() {
   if (!editId) return;
   const tipo  = document.getElementById('sgt-tipo').value;
   const texto = document.getElementById('sgt-texto').value.trim();
-  if (!texto) { toast('⚠️ Escribí una nota antes de agregar','err'); return; }
+  const horarioVisita = document.getElementById('sgt-visita-horario').value;
+  if (!texto && !(tipo === '🏠 Visita' && horarioVisita)) { toast('⚠️ Escribí una nota antes de agregar','err'); return; }
 
   const lead = leads.find(l => l.id === editId);
   if (!lead) return;
   if (!lead.seguimiento) lead.seguimiento = [];
 
   const now = new Date();
+  const textoFinal = tipo === '🏠 Visita'
+    ? [horarioVisita ? `Horario de visita: ${horarioVisita}` : '', texto].filter(Boolean).join(' · ')
+    : texto;
   const newEntry = {
     id:    uid(),
     tipo,
-    texto,
+    texto: textoFinal,
     fecha: now.toISOString().split('T')[0],
-    hora:  now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
+    hora:  now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'}),
+    horarioVisita
   };
 
   lead.seguimiento.push(newEntry);
+  if (tipo === '🏠 Visita') {
+    const notaVisita = [newEntry.fecha, textoFinal].filter(Boolean).join(' · ');
+    lead.notas = [lead.notas || '', notaVisita].filter(Boolean).join('\n');
+    setF('f-notas', lead.notas);
+  }
   saveLeadToSupabase(lead);
   saveData();
   renderSeguimiento(lead.seguimiento);
-  document.getElementById('sgt-texto').value = '';
+  resetSeguimientoForm();
   toast(`✅ ${tipo} registrado`,'ok');
 }
 
@@ -4801,6 +4855,11 @@ function clearClientSelection() {
 
 function openBulkWaModal() {
   if (selectedClientIds.size === 0) return;
+  const bar = document.getElementById('bulk-action-bar');
+  if (bar) {
+    bar.classList.remove('open');
+    bar.style.display = 'none';
+  }
   
   document.getElementById('bulk-f-template').value = '';
   document.getElementById('bulk-f-msg').value = '';
@@ -4815,6 +4874,7 @@ function openBulkWaModal() {
 function closeBulkWaModal() {
   document.getElementById('bulk-overlay').classList.remove('open');
   setOverlayState('bulk-overlay', false);
+  updateBulkActionBar();
 }
 
 function onBulkOvClick(e) {
@@ -4901,29 +4961,40 @@ function renderBulkQueueList() {
   }).join('');
 }
 
-function sendIndividualBulkWa(id) {
-  const l = leads.find(x => x.id === id);
-  if (!l) return;
+function buildBulkWaPayload(l) {
+  if (!l) return null;
   const baseMsg = document.getElementById('bulk-f-msg').value;
   if (!baseMsg.trim()) {
     toast('⚠️ Escribe un mensaje antes de enviar', 'err');
-    return;
+    return null;
   }
-  
+
+  const cleanPhone = (l.telefono || '').replace(/\D/g, '');
+  if (!cleanPhone) {
+    toast(`⚠️ ${l.nombre || 'Este cliente'} no tiene teléfono válido`, 'err');
+    return null;
+  }
+
   const msg = generatePersonalizedMsg(l, baseMsg);
-  const cleanPhone = l.telefono.replace(/\D/g, '');
   let finalPhone = cleanPhone;
   if (!finalPhone.startsWith('54') && finalPhone.length > 0) {
     finalPhone = '549' + finalPhone;
   }
-  
-  const url = `https://wa.me/${finalPhone}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-  
+
+  return {
+    msg,
+    url: `https://wa.me/${finalPhone}?text=${encodeURIComponent(msg)}`
+  };
+}
+
+function markBulkQueueAsSent(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+
   const statusEl = document.getElementById(`bq-status-${id}`);
   const btnEl = document.getElementById(`bq-btn-${id}`);
   const itemEl = document.getElementById(`bq-item-${id}`);
-  
+
   if (statusEl) {
     statusEl.textContent = 'Enviado ✅';
     statusEl.style.color = 'var(--success)';
@@ -4938,7 +5009,9 @@ function sendIndividualBulkWa(id) {
     itemEl.style.borderColor = 'var(--success)';
     itemEl.style.background = 'rgba(16, 185, 129, 0.05)';
   }
-  
+}
+
+function registerBulkWaSent(l, msg) {
   if (!l.seguimiento) l.seguimiento = [];
   const now = new Date();
   l.seguimiento.push({
@@ -4950,6 +5023,59 @@ function sendIndividualBulkWa(id) {
   });
   saveLeadToSupabase(l);
   saveData();
+}
+
+function sendIndividualBulkWa(id) {
+  const l = leads.find(x => x.id === id);
+  const payload = buildBulkWaPayload(l);
+  if (!l || !payload) return;
+
+  const popup = window.open(payload.url, '_blank');
+  if (!popup) {
+    toast('⚠️ El navegador bloqueó la ventana de WhatsApp', 'warning');
+    return;
+  }
+
+  markBulkQueueAsSent(id);
+  registerBulkWaSent(l, payload.msg);
+}
+
+function sendAllBulkWa() {
+  if (selectedClientIds.size === 0) return;
+
+  const selectedLeads = [...selectedClientIds]
+    .map(id => leads.find(x => x.id === id))
+    .filter(Boolean);
+
+  if (!selectedLeads.length) return;
+
+  const payloads = selectedLeads
+    .map(lead => ({ lead, payload: buildBulkWaPayload(lead) }))
+    .filter(item => item.payload);
+
+  if (!payloads.length) return;
+
+  let opened = 0;
+  let blocked = 0;
+
+  payloads.forEach(({ lead, payload }) => {
+    const popup = window.open(payload.url, '_blank');
+    if (popup) {
+      opened++;
+      markBulkQueueAsSent(lead.id);
+      registerBulkWaSent(lead, payload.msg);
+    } else {
+      blocked++;
+    }
+  });
+
+  if (opened && !blocked) {
+    toast(`✅ Se abrieron ${opened} WhatsApp`, 'ok');
+  } else if (opened && blocked) {
+    toast(`⚠️ Se abrieron ${opened} y ${blocked} fueron bloqueados`, 'warning');
+  } else {
+    toast('⚠️ El navegador bloqueó los envíos masivos', 'err');
+  }
 }
 
 /* ─── INIT ─── */
@@ -5776,7 +5902,7 @@ Nuevo → Contactado → Visita Coordinada → Visita Realizada → Negociación
 <h3>Envío individual</h3>
 <p>Abrí la ficha del cliente → clic en 💬 WhatsApp → elegí plantilla → se abre WhatsApp con el mensaje personalizado. El envío queda registrado en el historial automáticamente.</p>
 <h3>Envío en Lote</h3>
-<p>Seleccioná clientes con ☐ → <strong>💬 WhatsApp en Lote</strong> → elegí plantilla o escribí mensaje → enviá uno a uno desde la cola de despacho. Cada envío pasa a ✅ Enviado y queda en el historial.</p>
+<p>Seleccioná clientes con ☐ → <strong>💬 WhatsApp en Lote</strong> → elegí plantilla o escribí mensaje → tocá <strong>Enviar</strong> para abrir todos los WhatsApp de una vez, o usá la cola para enviarlos individualmente. Cada envío queda registrado en el historial.</p>
 
 <h2 id="s8">⚡ 8. Registro Rápido de Contacto</h2>
 <p>Al tocar 📞 o 💬 desde el Dashboard, la tabla o la Agenda, se abre el modal de Registro Rápido.</p>
@@ -5858,3 +5984,5 @@ initNotifications();
 </script>
 </body>
 </html>
+
+
