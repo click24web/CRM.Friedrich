@@ -2461,9 +2461,9 @@
             <label>📍 Localidad de Búsqueda</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="f-group">
-                <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 1: Zona</label>
+                <label style="font-size: 10px; color: var(--text-d); text-transform: uppercase;">Paso 1: Zona de búsqueda</label>
                 <select id="f-zona" onchange="selectLocalidadZona(this.value)">
-                  <option value="">Seleccionar zona...</option>
+                  <option value="">Seleccionar zona de búsqueda...</option>
                   <option value="Capital Federal">Capital Federal</option>
                   <option value="Gran Buenos Aires">Gran Buenos Aires / AMBA</option>
                   <option value="Interior Provincia">Interior Provincia</option>
@@ -2606,6 +2606,7 @@
             <div class="pill-group" id="pg-financiacion">
               <div class="pill" data-val="Anticipo y saldo financiado" onclick="pickPill('pg-financiacion','Anticipo y saldo financiado',false,this)">📑 Anticipo y saldo financiado</div>
               <div class="pill" data-val="Contado" onclick="pickPill('pg-financiacion','Contado',false,this)">💵 Contado</div>
+              <div class="pill" data-val="Permuta" onclick="pickPill('pg-financiacion','Permuta',false,this)">🔁 Permuta</div>
               <div class="pill" data-val="En pozo" onclick="pickPill('pg-financiacion','En pozo',false,this)">🏗️ En pozo</div>
               <div class="pill" data-val="Financiación particular" onclick="pickPill('pg-financiacion','Financiación particular',false,this)">🤝 Financiación particular</div>
               <div class="pill" data-val="Sin definir" onclick="pickPill('pg-financiacion','Sin definir',false,this)">❓ Sin definir</div>
@@ -2620,7 +2621,7 @@
         <div class="f-grid">
           <div class="f-group">
             <label>Etapa del Pipeline</label>
-            <select id="f-etapa"></select>
+            <select id="f-etapa" onchange="handleEtapaChange()"></select>
           </div>
           <div class="f-group">
             <label>Origen del Lead</label>
@@ -2638,6 +2639,10 @@
               <input type="date" id="f-prox-contacto" oninput="updateProxBadge(this.value)">
               <span class="prox-badge" id="prox-badge" style="display:none"></span>
             </div>
+          </div>
+          <div class="f-group" id="f-visita-hora-wrap" style="display:none">
+            <label>⏰ Horario de la Visita</label>
+            <input type="time" id="f-visita-hora">
           </div>
           <div class="f-group f-full">
             <label>Observaciones / Notas</label>
@@ -2914,8 +2919,27 @@ function leadToRow(l) {
   };
 }
 
+function getLeadScheduledVisitEntry(lead) {
+  const entries = Array.isArray(lead?.seguimiento) ? lead.seguimiento : [];
+  const autoEntry = [...entries].reverse().find(e => e && e.autoVisitaProgramada);
+  if (autoEntry) return autoEntry;
+  return [...entries].reverse().find(e =>
+    e &&
+    e.tipo === '🏠 Visita' &&
+    e.horarioVisita &&
+    (!lead?.proximoContacto || e.fecha === lead.proximoContacto)
+  ) || null;
+}
+
+function getLeadVisitScheduleTime(lead) {
+  if (lead?.visitaHorario) return lead.visitaHorario;
+  return getLeadScheduledVisitEntry(lead)?.horarioVisita || '';
+}
+
 // Conversión de Fila Supabase a Lead JS (camelCase)
 function rowToLead(r) {
+  const seguimiento = r.seguimiento || [];
+  const proximoContacto = r.proximocontacto || '';
   return {
     id: r.id,
     nombre: r.nombre,
@@ -2937,8 +2961,9 @@ function rowToLead(r) {
     origen: r.origen || '',
     notas: r.notas || '',
     creadoEn: r.creadoen || '',
-    proximoContacto: r.proximocontacto || '',
-    seguimiento: r.seguimiento || [],
+    proximoContacto,
+    visitaHorario: getLeadVisitScheduleTime({ seguimiento, proximoContacto }),
+    seguimiento,
     updatedAt: r.updatedat || ''
   };
 }
@@ -3603,7 +3628,8 @@ function renderAlerts() {
   document.getElementById('alerts-grid').innerHTML = alerts.map(l => {
     const isOverdue = l.proximoContacto < today;
     const cls  = isOverdue ? 'overdue' : 'today';
-    const lbl  = isOverdue ? `Vencido ${fmtDate(l.proximoContacto)}` : 'Hoy';
+    const visitTime = l.etapa === 'Visita Coordinada' ? getLeadVisitScheduleTime(l) : '';
+    const lbl  = isOverdue ? `Vencido ${fmtDate(l.proximoContacto)}${visitTime ? ' · ' + visitTime : ''}` : `Hoy${visitTime ? ' · ' + visitTime : ''}`;
     const icon = isOverdue ? '🔴' : '🟡';
     const last = l.seguimiento && l.seguimiento.length
       ? ' · Último: ' + l.seguimiento[l.seguimiento.length-1].tipo
@@ -3748,6 +3774,7 @@ function renderKanban() {
 
 function kCard(l) {
   const today = new Date().toISOString().split('T')[0];
+  const visitTime = l.etapa === 'Visita Coordinada' ? getLeadVisitScheduleTime(l) : '';
   const alertIco = l.proximoContacto
     ? (l.proximoContacto < today ? '🔴' : l.proximoContacto === today ? '🟡' : '')
     : '';
@@ -3760,6 +3787,7 @@ function kCard(l) {
     <div class="k-card-row">📞 ${l.telefono}</div>
     ${l.localidad||(Array.isArray(l.barrio)?l.barrio.length:l.barrio) ? `<div class="k-card-row">📍 ${[l.localidad, Array.isArray(l.barrio) ? l.barrio.join(' · ') : l.barrio].filter(Boolean).join(' › ')}</div>` : ''}
     ${l.operacion ? `<div class="k-card-row">🏠 ${l.operacion}${l.tipoPropiedad?.length?' · '+l.tipoPropiedad[0]:''}</div>` : ''}
+    ${visitTime ? `<div class="k-card-row">⏰ ${visitTime}</div>` : ''}
     ${fmtBudget(l) ? `<div class="k-card-budget">${fmtBudget(l)}</div>` : ''}
     <div class="k-card-ft">
       <span class="k-card-origin">${l.origen||'—'}</span>
@@ -3994,6 +4022,7 @@ function openModal(id = null) {
     setF('f-origen',      l.origen||'');
     setF('f-fecha',       l.creadoEn||new Date().toISOString().split('T')[0]);
     setF('f-prox-contacto', l.proximoContacto||'');
+    setF('f-visita-hora', l.visitaHorario || getLeadVisitScheduleTime(l) || '');
     
     // Parsear operación temporaria
     let operacionVal = l.operacion || 'Compra';
@@ -4014,10 +4043,11 @@ function openModal(id = null) {
     syncPillGroup('pg-credito',     l.creditoHipotecario||'No', false);
     updateFinanciacion(operacionVal, l.financiacion||'');
     syncPillGroup('pg-tipo',        l.tipoPropiedad||[], true);
+    handleEtapaChange();
     updateProxBadge(l.proximoContacto||'');
     renderSeguimiento(l.seguimiento||[]);
   } else {
-    ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto','f-ambientes','f-banos','f-temp-meses'].forEach(fid=>setF(fid,''));
+    ['f-nombre','f-tel','f-pmin','f-pmax','f-notas','f-prox-contacto','f-visita-hora','f-ambientes','f-banos','f-temp-meses'].forEach(fid=>setF(fid,''));
     
     // Reset Localidad
     setF('f-zona', '');
@@ -4043,6 +4073,7 @@ function openModal(id = null) {
     updateFinanciacion('Compra', '');
     syncPillGroup('pg-credito','No',false);
     syncPillGroup('pg-tipo',[],true);
+    handleEtapaChange();
     document.getElementById('prox-badge').style.display = 'none';
     renderSeguimiento([]);
   }
@@ -4066,8 +4097,15 @@ function onOvClick(e) { if(e.target===document.getElementById('overlay')) closeM
 function saveClient(force = false) {
   const nombre   = getF('f-nombre').trim();
   const telefono = getF('f-tel').trim();
+  const etapa = getF('f-etapa');
+  const proximoContacto = getF('f-prox-contacto');
+  const visitaHorario = etapa === 'Visita Coordinada' ? getF('f-visita-hora') : '';
   if (!nombre)   { toast('⚠️ El nombre es obligatorio','err'); return; }
   if (!telefono) { toast('⚠️ El teléfono es obligatorio','err'); return; }
+  if (visitaHorario && !proximoContacto) {
+    toast('⚠️ Si cargás un horario de visita, indicá también la fecha','err');
+    return;
+  }
 
   // Validar duplicado de teléfono (solo comparando dígitos)
   const cleanNewPhone = telefono.replace(/\D/g, '');
@@ -4108,10 +4146,11 @@ function saveClient(force = false) {
     cochera:            getF('f-cochera'),
     creditoHipotecario: getPillVal('pg-credito'),
     financiacion:       getPillVal('pg-financiacion'),
-    etapa:              getF('f-etapa'),
+    etapa,
     origen:             getF('f-origen'),
     notas:              getF('f-notas').trim(),
-    proximoContacto:    getF('f-prox-contacto'),
+    proximoContacto,
+    visitaHorario,
     updatedAt:          new Date().toISOString()
   };
 
@@ -4135,6 +4174,7 @@ function saveClient(force = false) {
       }
 
       const updatedLead = { ...oldLead, ...data, seguimiento };
+      syncLeadVisitSchedule(updatedLead);
       leads[idx] = updatedLead;
       saveLeadToSupabase(updatedLead);
       toast('✅ Cliente actualizado','ok');
@@ -4156,6 +4196,7 @@ function saveClient(force = false) {
       ],
       ...data
     };
+    syncLeadVisitSchedule(newLead);
     leads.unshift(newLead);
     saveLeadToSupabase(newLead);
     toast('✅ Cliente agregado','ok');
@@ -4197,7 +4238,7 @@ function renderSeguimiento(entries) {
     const col    = SGT_COLORS[e.tipo] || { bg:'rgba(100,100,100,.12)', color:'#666' };
     const isLast = idx === sorted.length - 1;
     const emoji  = e.tipo.split(' ')[0];
-    const timeLabel = e.horarioVisita ? ` · Visita ${e.horarioVisita}` : (e.hora ? ` · ${e.hora}` : '');
+    const timeLabel = e.horarioVisita ? ` · Visita ${e.horarioVisita}` : (!e.autoVisitaProgramada && e.hora ? ` · ${e.hora}` : '');
     return `
     <div class="sgt-entry">
       <div class="sgt-line-wrap">
@@ -4214,6 +4255,50 @@ function renderSeguimiento(entries) {
       </div>
     </div>`;
   }).join('');
+}
+
+function buildVisitScheduleText(lead) {
+  const parts = [];
+  if (lead.proximoContacto) parts.push(`para el ${fmtDate(lead.proximoContacto)}`);
+  if (lead.visitaHorario) parts.push(`a las ${lead.visitaHorario}`);
+  return `Visita coordinada${parts.length ? ' ' + parts.join(' ') : ''}`;
+}
+
+function syncLeadVisitSchedule(lead) {
+  if (!lead) return;
+  if (!Array.isArray(lead.seguimiento)) lead.seguimiento = [];
+
+  const existingIndex = lead.seguimiento.findIndex(e => e && e.autoVisitaProgramada);
+  const shouldTrackVisit = lead.etapa === 'Visita Coordinada' && !!lead.proximoContacto;
+
+  if (!shouldTrackVisit) {
+    if (existingIndex !== -1) lead.seguimiento.splice(existingIndex, 1);
+    lead.visitaHorario = '';
+    return;
+  }
+
+  const now = new Date();
+  const entry = {
+    id: existingIndex !== -1 ? lead.seguimiento[existingIndex].id : uid(),
+    tipo: '🏠 Visita',
+    texto: buildVisitScheduleText(lead),
+    fecha: lead.proximoContacto,
+    hora: now.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' }),
+    horarioVisita: lead.visitaHorario || '',
+    autoVisitaProgramada: true
+  };
+
+  if (existingIndex !== -1) {
+    lead.seguimiento[existingIndex] = { ...lead.seguimiento[existingIndex], ...entry };
+  } else {
+    lead.seguimiento.push(entry);
+  }
+}
+
+function handleEtapaChange() {
+  const visitaHoraWrap = document.getElementById('f-visita-hora-wrap');
+  if (!visitaHoraWrap) return;
+  visitaHoraWrap.style.display = getF('f-etapa') === 'Visita Coordinada' ? 'block' : 'none';
 }
 
 function handleSeguimientoTypeChange() {
@@ -4390,6 +4475,7 @@ function updateFinanciacion(operacion, selectedVal = null) {
     const options = [
       { val: 'Anticipo y saldo financiado', label: '📑 Anticipo y saldo financiado' },
       { val: 'Contado', label: '💵 Contado' },
+      { val: 'Permuta', label: '🔁 Permuta' },
       { val: 'En pozo', label: '🏗️ En pozo' },
       { val: 'Financiación particular', label: '🤝 Financiación particular' },
       { val: 'Sin definir', label: '❓ Sin definir' }
@@ -4485,11 +4571,13 @@ function creditBadge(v) {
 function proxBadgeInline(l) {
   if (!l.proximoContacto) return '<span style="color:var(--text-d)">—</span>';
   const today = new Date().toISOString().split('T')[0];
+  const visitTime = l.etapa === 'Visita Coordinada' ? getLeadVisitScheduleTime(l) : '';
+  const suffix = visitTime ? ` · ${visitTime}` : '';
   if (l.proximoContacto < today)
-    return `<span class="badge" style="background:rgba(220,38,38,.1);color:#dc2626">🔴 ${fmtDate(l.proximoContacto)}</span>`;
+    return `<span class="badge" style="background:rgba(220,38,38,.1);color:#dc2626">🔴 ${fmtDate(l.proximoContacto)}${suffix}</span>`;
   if (l.proximoContacto === today)
-    return `<span class="badge" style="background:rgba(217,119,6,.1);color:#d97706">🟡 Hoy</span>`;
-  return `<span style="color:var(--text-m);font-size:11.5px">${fmtDate(l.proximoContacto)}</span>`;
+    return `<span class="badge" style="background:rgba(217,119,6,.1);color:#d97706">🟡 Hoy${suffix}</span>`;
+  return `<span style="color:var(--text-m);font-size:11.5px">${fmtDate(l.proximoContacto)}${suffix}</span>`;
 }
 
 function updateBadges() {
@@ -5365,13 +5453,14 @@ function renderAgendaDay(dateStr) {
       ? l.seguimiento[l.seguimiento.length - 1].texto
       : 'Sin seguimientos aún';
     const color = STAGE_COLOR[l.etapa] || '#7c3aed';
+    const visitTime = l.etapa === 'Visita Coordinada' ? getLeadVisitScheduleTime(l) : '';
     return `
       <div style="background:var(--surface2); border:1px solid var(--border); border-left: 3px solid ${color}; border-radius:var(--r-sm); padding:12px; cursor:pointer; transition:all var(--t);" onclick="openModal('${l.id}')" onmouseover="this.style.background='var(--surface3)'" onmouseout="this.style.background='var(--surface2)'">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
           <div style="font-size:13px; font-weight:700; color:var(--text);">${l.nombre}</div>
           <span style="font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:12px; background:${color}22; color:${color};">${l.etapa}</span>
         </div>
-        <div style="font-size:11px; color:var(--text-m); margin-bottom:6px;">📞 ${l.telefono}${l.barrio ? ' · 📍 ' + l.barrio : ''}</div>
+        <div style="font-size:11px; color:var(--text-m); margin-bottom:6px;">📞 ${l.telefono}${l.barrio ? ' · 📍 ' + l.barrio : ''}${visitTime ? ' · ⏰ ' + visitTime : ''}</div>
         <div style="font-size:11px; color:var(--text-d); font-style:italic; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${last}</div>
         <div style="margin-top:8px; display:flex; gap:6px;">
           <button onclick="event.stopPropagation(); triggerQuickContact('${l.id}', '📞 Llamada')" style="flex:1; padding:5px; border:1px solid var(--border2); border-radius:var(--r-sm); background:transparent; color:var(--text-m); cursor:pointer; font-size:11px; transition:all var(--t);" onmouseover="this.style.background='var(--surface3)'" onmouseout="this.style.background='transparent'">📞 Llamar</button>
