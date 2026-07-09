@@ -1,0 +1,23 @@
+SUBIR ESTOS ARCHIVOS A GITHUB:
+
+- index.html
+- manifest.webmanifest
+- icons/apple-touch-icon.png
+- icons/icon-192.png
+- icons/icon-512.png
+
+IMPORTANTE:
+
+Ahora mismo estos 3 iconos siguen siendo los que ya estaban generados antes.
+Si subis esta carpeta tal cual, el acceso directo NO va a mostrar el logo CLICK24 del mensaje.
+
+Para que salga el logo CLICK24, reemplaza estos 3 archivos por versiones del logo nuevo:
+
+- icons/apple-touch-icon.png
+- icons/icon-192.png
+- icons/icon-512.png
+
+Despues de subir a GitHub y publicar los cambios:
+
+- en iPhone: borrar el acceso viejo y volver a "Agregar a pantalla de inicio"
+- en PC: borrar el acceso/app vieja y volver a crearla si sigue mostrando cache
